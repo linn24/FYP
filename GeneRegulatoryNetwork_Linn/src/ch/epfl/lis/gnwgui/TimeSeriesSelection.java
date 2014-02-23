@@ -19,7 +19,7 @@ import javax.swing.event.ListSelectionListener;
 
 
 public class TimeSeriesSelection extends JPanel implements ActionListener {
-    TimeSeriesVisualizer visualizer_ = new TimeSeriesVisualizer();
+    TimeSeriesVisualizer visualizer_ = new TimeSeriesVisualizer(GnwGuiSettings.getInstance().getGnwGui().getFrame());
     JLabel fileName, timeSeriesName, geneName;
     JComboBox fileList, timeSeriesList;
     JList geneList;
@@ -37,7 +37,7 @@ public class TimeSeriesSelection extends JPanel implements ActionListener {
         this.networkLabel = networkLabel;
 
         //visualizer_.displayGraph(networkLabel + "_" + options[optionList.getSelectedIndex()] + ".tsv");
-        
+        visualizer_.setHeaderInfo(networkLabel);
         
         Vector<String> vFiles = new Vector<String>();
         vFiles = this.populateFileOptions();
@@ -120,6 +120,8 @@ public class TimeSeriesSelection extends JPanel implements ActionListener {
                         JComboBox combo = (JComboBox)e.getSource();
                         int tsIndex = combo.getSelectedIndex();
                         visualizer_.displayGraph(tsIndex, geneList.getSelectedIndex());//0);
+                        visualizer_.setHeaderInfo(networkLabel);
+                        visualizer_.setVisible(true);
                     }
                 }    
             );
@@ -151,6 +153,8 @@ public class TimeSeriesSelection extends JPanel implements ActionListener {
                             }
                             
                             visualizer_.displayGraph(timeSeriesList.getSelectedIndex(), selectedValues);
+                            visualizer_.setHeaderInfo(networkLabel);
+                            visualizer_.setVisible(true);
                         }
                         
                     }
@@ -160,6 +164,9 @@ public class TimeSeriesSelection extends JPanel implements ActionListener {
         
         System.out.println("before");
         visualizer_.displayGraph(0, new int[]{0});
+        visualizer_.setHeaderInfo(networkLabel);
+        visualizer_.setVisible(true);
+        
         System.out.println("after");
         //geneList.setSelectedIndex(0);
         geneList.clearSelection();

@@ -124,7 +124,7 @@ public class Options extends OptionsWindow
 			public void actionPerformed(final ActionEvent e)
 			{
 				dispose();
-				viewNetwork((NetworkElement) item_);;
+				viewNetwork((NetworkElement) item_);
 			}
 		});
 		

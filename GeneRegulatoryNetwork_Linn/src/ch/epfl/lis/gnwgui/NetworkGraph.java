@@ -26,6 +26,7 @@ THE SOFTWARE.
 
 package ch.epfl.lis.gnwgui;
 
+import ch.epfl.lis.gnw.GeneNetwork;
 import edu.uci.ics.jung.algorithms.layout.AbstractLayout;
 import edu.uci.ics.jung.algorithms.layout.FRLayout;
 import edu.uci.ics.jung.algorithms.layout.CircleLayout;
@@ -86,6 +87,7 @@ import ch.epfl.lis.gnwgui.jungtransformers.NodeFillColorTransformer;
 import ch.epfl.lis.gnwgui.jungtransformers.EdgeFillColorTransformer;
 import ch.epfl.lis.gnwgui.jungtransformers.NodeLabelLabeller;
 import ch.epfl.lis.gnwgui.windows.GraphViewerController;
+import ch.epfl.lis.imod.ImodNetwork;
 import ch.epfl.lis.utilities.filefilters.FilenameUtilities;
 import ch.epfl.lis.utilities.filefilters.FilterImageEPS;
 import ch.epfl.lis.utilities.filefilters.FilterImageJPEG;
@@ -487,8 +489,29 @@ public class NetworkGraph {
                         System.out.println("after: " + tempGraph.structure_.getSize());                        
                     }
                     
+                    
+                    // update item_
+                    if (tempGraph.item_ instanceof StructureElement) {
+                        ((StructureElement)tempGraph.item_).setNetwork((ImodNetwork)tempGraph.structure_);
+                        //structure_ = (.getNetwork();
+                    } else if (tempGraph.item_ instanceof DynamicalModelElement) {
+                        ((DynamicalModelElement)tempGraph.item_).setGeneNetwork((GeneNetwork)tempGraph.structure_);
+                    }
+
+                    // close current window
+                    // ----
+                    /*
+                    tempGraph.netSize_ = tempGraph.structure_.getSize();
+                    tempGraph.control_ = new MyGraphViewerController();
+                    tempGraph.screen_ = new JPanel();
+                    tempGraph.screen_.setLayout(new BorderLayout());
+                    tempGraph.computeGraph();
+                    */
+                    tempGraph.initialize();
+                    
+                    Options.viewNetwork(tempGraph.item_);
                     // export the temporary network with changes
-                    IONetwork.saveAs((NetworkElement) tempGraph.item_);                    
+                    //IONetwork.saveAs((NetworkElement) tempGraph.item_);                    
 
 		   }
 	   });
