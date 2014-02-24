@@ -1,0 +1,87 @@
+
+   [beaver] Error: grammar has unreducible productions
+   [beaver] parser.beaver:80,15-80,24: Error: Production "Expressions = Expression" can not be reduced
+   [beaver] Expressions = Expression 
+   [beaver]               ^--------^
+   [beaver] parser.beaver:81,6-81,33: Error: Production "Expressions = Expressions COMMA Expression" can not be reduced
+   [beaver]    | Expressions COMMA Expression
+   [beaver]      ^--------------------------^
+   [beaver] parser.beaver: Error: Production "Expressions = " can not be reduced
+   [beaver] parser.beaver:100,22-100,25: Error: Production "ComparisonOperator = EQEQ" can not be reduced
+   [beaver] ComparisonOperator = EQEQ 
+   [beaver]                      ^--^
+   [beaver] parser.beaver:101,8-101,10: Error: Production "ComparisonOperator = NEQ" can not be reduced
+   [beaver]      | NEQ 
+   [beaver]        ^-^
+   [beaver] parser.beaver:102,8-102,10: Error: Production "ComparisonOperator = LEQ" can not be reduced
+   [beaver]      | LEQ 
+   [beaver]        ^-^
+   [beaver] parser.beaver:103,8-103,10: Error: Production "ComparisonOperator = GEQ" can not be reduced
+   [beaver]      | GEQ 
+   [beaver]        ^-^
+   [beaver] parser.beaver:104,8-104,9: Error: Production "ComparisonOperator = LT" can not be reduced
+   [beaver]      | LT 
+   [beaver]        ^^
+   [beaver] parser.beaver:105,8-105,9: Error: Production "ComparisonOperator = GT" can not be reduced
+   [beaver]      | GT;
+   [beaver]        ^^
+   [beaver] parser.beaver:109,8-109,41: Error: Production "Term = Term MultiplicativeOperator Factor" can not be reduced
+   [beaver] Term = Term MultiplicativeOperator Factor
+   [beaver]        ^--------------------------------^
+   [beaver] parser.beaver:110,5-110,10: Error: Production "Term = Factor" can not be reduced
+   [beaver]   | Factor;
+   [beaver]     ^----^
+   [beaver] parser.beaver:111,26-111,30: Error: Production "MultiplicativeOperator = TIMES" can not be reduced
+   [beaver] MultiplicativeOperator = TIMES 
+   [beaver]                          ^---^
+   [beaver] parser.beaver:112,9-112,11: Error: Production "MultiplicativeOperator = DIV" can not be reduced
+   [beaver]       | DIV 
+   [beaver]         ^-^
+   [beaver] parser.beaver:113,9-113,11: Error: Production "MultiplicativeOperator = MOD" can not be reduced
+   [beaver]       | MOD;
+   [beaver]         ^-^
+   [beaver] parser.beaver:114,10-114,21: Error: Production "Factor = MINUS Factor" can not be reduced
+   [beaver] Factor = MINUS Factor
+   [beaver]          ^----------^
+   [beaver] parser.beaver:115,6-115,22: Error: Production "Factor = PrimaryExpression" can not be reduced
+   [beaver]    | PrimaryExpression;
+   [beaver]      ^---------------^
+   [beaver] parser.beaver:116,21-116,42: Error: Production "PrimaryExpression = LeftHandSideExpression" can not be reduced
+   [beaver] PrimaryExpression = LeftHandSideExpression
+   [beaver]                     ^--------------------^
+   [beaver] parser.beaver:117,8-117,19: Error: Production "PrimaryExpression = FunctionCall" can not be reduced
+   [beaver]      | FunctionCall
+   [beaver]        ^----------^
+   [beaver] parser.beaver:118,8-118,22: Error: Production "PrimaryExpression = ArrayExpression" can not be reduced
+   [beaver]      | ArrayExpression
+   [beaver]        ^-------------^
+   [beaver] parser.beaver:119,8-119,21: Error: Production "PrimaryExpression = STRING_LITERAL" can not be reduced
+   [beaver]      | STRING_LITERAL
+   [beaver]        ^------------^
+   [beaver] parser.beaver:120,8-120,18: Error: Production "PrimaryExpression = INT_LITERAL" can not be reduced
+   [beaver]      | INT_LITERAL
+   [beaver]        ^---------^
+   [beaver] parser.beaver:121,8-121,11: Error: Production "PrimaryExpression = TRUE" can not be reduced
+   [beaver]      | TRUE
+   [beaver]        ^--^
+   [beaver] parser.beaver:122,8-122,12: Error: Production "PrimaryExpression = FALSE" can not be reduced
+   [beaver]      | FALSE
+   [beaver]        ^---^
+   [beaver] parser.beaver:123,8-123,30: Error: Production "PrimaryExpression = ParenthesisedExpression" can not be reduced
+   [beaver]      | ParenthesisedExpression;
+   [beaver]        ^---------------------^
+   [beaver] parser.beaver:124,16-124,43: Error: Production "FunctionCall = ID LPAREN Expressions RPAREN" can not be reduced
+   [beaver] FunctionCall = ID LPAREN Expressions RPAREN;
+   [beaver]                ^--------------------------^
+   [beaver] parser.beaver:125,19-125,58: Error: Production "ArrayExpression = LBRACKET Expression Expressions RBRACKET" can not be reduced
+   [beaver] ArrayExpression = LBRACKET Expression Expressions RBRACKET;
+   [beaver]                   ^--------------------------------------^
+   [beaver] parser.beaver:126,27-126,50: Error: Production "ParenthesisedExpression = LPAREN Expression RPAREN" can not be reduced
+   [beaver] ParenthesisedExpression = LPAREN Expression RPAREN;
+   [beaver]                           ^----------------------^
+   [beaver] parser.beaver:17,35-17,38: Warning: declared terminal is not used by the grammar
+   [beaver] %terminals MODULE, INT, VOID, IF, ELSE, WHILE, RETURN, BREAK, BOOLEAN, PUBLIC, TRUE, FALSE,
+   [beaver]                                   ^--^
+   [beaver] parser.beaver: 27 errors, 1 warning.
+BUILD SUCCESSFUL
+Total time: 1 second
