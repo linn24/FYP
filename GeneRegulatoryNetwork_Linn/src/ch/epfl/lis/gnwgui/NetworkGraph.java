@@ -176,6 +176,13 @@ public class NetworkGraph {
     /** Represent the layout of the network representation */
     private AbstractLayout<Node,Edge> layout_ = null;
     
+    /** Temporary graph to store the structure of original network */
+    private ArrayList<Node> tempNodes_ = null;    
+    private ArrayList<Edge> tempEdges_ = null;    
+    
+    /** To check if changes has been made*/
+    private boolean noChanges = true;
+    
     /** Graph signature */
     private GraphSignature signature_ = null;
     
@@ -311,7 +318,8 @@ public class NetworkGraph {
         
         setScreen(vv_); // Draw the viewer into the panel displayed
         addPrintAction(screen_); // Add the key action ALT-P to print the JPanel screen_
-        addDeleteAction(screen_); // Add the key action Delete to print the JPanel screen_
+        addDeleteAction(screen_); // Add the key action Delete to delete selected nodes
+        addSaveAction(screen_); // Add the key action Ctrl-S to save the changes
         
         // Finally, add the signature at the low-bottom corner of the graph visualization
 //        addSignature(vv_);
@@ -445,7 +453,7 @@ public class NetworkGraph {
         
         @SuppressWarnings("serial")
         public void addDeleteAction(JComponent jp) {
-            KeyStroke k = KeyStroke.getKeyStroke("alt D");
+            KeyStroke k = KeyStroke.getKeyStroke("control D");
             jp.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(k, "deletenode");
             jp.getActionMap().put("deletenode", new AbstractAction() {
                 public void actionPerformed(ActionEvent arg0) {
@@ -463,22 +471,35 @@ public class NetworkGraph {
                     // confirm to delete all picked nodes
 
                     // copy the current network into a temporary network
-                    NetworkGraph tempGraph = new NetworkGraph(item_);
+                    if (noChanges){
+                        tempNodes_ = new ArrayList<Node>(structure_.getNodes());
+                        tempEdges_ = new ArrayList<Edge>(structure_.getEdges());
+                    }
+                    /*
+                    if (tempGraph_.item_ instanceof StructureElement) {
+                        tempGraph_.structure_ = ((StructureElement)tempGraph_.item_).getNetwork();
+                    } else if (tempGraph_.item_ instanceof DynamicalModelElement) {
+                        tempGraph_.structure_ = ((DynamicalModelElement)tempGraph_.item_).getGeneNetwork();
+                    }
+                    */
+                    System.out.println("total number of nodes in original network is " + tempNodes_.size());
+                    System.out.println("total number of edges in original network is " + tempEdges_.size());
                     
                     // delete the picked edges first
+                    /*
                     ArrayList<Edge> edges = new ArrayList<Edge>();
                     for (Iterator<Edge> edgeIt = picked_edges.iterator(); edgeIt.hasNext(); ) {
                         Edge edgeToDelete = edgeIt.next();
                         System.out.println(edgeToDelete.getSource() + " to "+ edgeToDelete.getTarget());
-                        System.out.println("before: " + tempGraph.structure_.getNumEdges());
-                        edges = tempGraph.structure_.getEdges();
+                        System.out.println("before: " + tempGraph_.structure_.getNumEdges());
+                        edges = tempGraph_.structure_.getEdges();
                         
                         if(edges.remove(edgeToDelete)){
-                            tempGraph.structure_.setEdges(edges);
+                            tempGraph_.structure_.setEdges(edges);
                         }
-                        System.out.println("after: " + tempGraph.structure_.getNumEdges());                        
+                        System.out.println("after: " + tempGraph_.structure_.getNumEdges());                        
                     }
-                    
+                    */
                     
                     
                     // delete the picked nodes
@@ -516,8 +537,37 @@ public class NetworkGraph {
                     
                     //Options.viewNetwork(tempGraph.item_);
                     
-                    // export the temporary network with changes
-                    //IONetwork.saveAs((NetworkElement) tempGraph.item_);                    
+                    
+		   }
+	   });
+	}
+        
+        @SuppressWarnings("serial")
+	public void addSaveAction(JComponent jp) {
+	   KeyStroke k = KeyStroke.getKeyStroke("control S");
+	   jp.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(k, "savechanges");
+	   jp.getActionMap().put("savechanges", new AbstractAction() {
+                    public void actionPerformed(ActionEvent arg0) {
+                        System.out.println("inside save");
+                        // export the network with changes
+                        IONetwork.saveAs((NetworkElement) item_);
+                        System.out.println("size of modified network is " + structure_.getSize());
+                    
+                        // update item_
+                        //structure_ = new Structure(tempStructure_);
+                        structure_.setNodes(tempNodes_);
+                        structure_.setEdges(tempEdges_);
+                        System.out.println("size of original network is " + structure_.getSize());
+                    
+                        /*
+                        if (item_ instanceof StructureElement) {
+                            ((StructureElement)item_).setNetwork((ImodNetwork)tempGraph_.structure_);
+                        } else if (item_ instanceof DynamicalModelElement) {
+                            ((DynamicalModelElement)item_).setGeneNetwork((GeneNetwork)tempGraph_.structure_);
+                        }
+                        */
+                        netSize_ = structure_.getSize();
+                        computeGraph();
 
 		   }
 	   });
