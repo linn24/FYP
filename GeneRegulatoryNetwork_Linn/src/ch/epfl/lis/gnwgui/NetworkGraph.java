@@ -177,8 +177,7 @@ public class NetworkGraph {
     private AbstractLayout<Node,Edge> layout_ = null;
     
     /** Temporary graph to store the structure of original network */
-    private ArrayList<Node> tempNodes_ = null;    
-    private ArrayList<Edge> tempEdges_ = null;    
+    private Structure tempStructure_ = null;    
     
     /** To check if changes has been made*/
     private boolean noChanges = true;
@@ -472,8 +471,7 @@ public class NetworkGraph {
 
                     // copy the current network into a temporary network
                     if (noChanges){
-                        tempNodes_ = new ArrayList<Node>(structure_.getNodes());
-                        tempEdges_ = new ArrayList<Edge>(structure_.getEdges());
+                        tempStructure_ = structure_.copy();
                     }
                     /*
                     if (tempGraph_.item_ instanceof StructureElement) {
@@ -482,8 +480,8 @@ public class NetworkGraph {
                         tempGraph_.structure_ = ((DynamicalModelElement)tempGraph_.item_).getGeneNetwork();
                     }
                     */
-                    System.out.println("total number of nodes in original network is " + tempNodes_.size());
-                    System.out.println("total number of edges in original network is " + tempEdges_.size());
+                    System.out.println("total number of nodes in original network is " + tempStructure_.getSize());
+                    System.out.println("total number of edges in original network is " + tempStructure_.getNumEdges());
                     
                     // delete the picked edges first
                     /*
@@ -555,8 +553,7 @@ public class NetworkGraph {
                     
                         // update item_
                         //structure_ = new Structure(tempStructure_);
-                        structure_.setNodes(tempNodes_);
-                        structure_.setEdges(tempEdges_);
+                        structure_ = tempStructure_.copy();
                         System.out.println("size of original network is " + structure_.getSize());
                     
                         /*
