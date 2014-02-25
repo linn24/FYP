@@ -436,6 +436,8 @@ public class NetworkGraph {
 		vv_.repaint();
 	}
 	
+        
+        
 	
 	// ----------------------------------------------------------------------------
 	
@@ -517,10 +519,10 @@ public class NetworkGraph {
                     
                     // update item_
                     if (item_ instanceof StructureElement) {
-                        ((StructureElement)item_).setNetwork((ImodNetwork)structure_);
+                        ((StructureElement)item_).setNetwork(new ImodNetwork(structure_));
                         //structure_ = (.getNetwork();
                     } else if (item_ instanceof DynamicalModelElement) {
-                        ((DynamicalModelElement)item_).setGeneNetwork((GeneNetwork)structure_);
+                        ((DynamicalModelElement)item_).setGeneNetwork(new GeneNetwork(structure_));
                     }
 
                     // close current window
@@ -535,6 +537,7 @@ public class NetworkGraph {
                     
                     netSize_ = structure_.getSize();
                     computeGraph();
+                    control_.resetControlSetting();
             
                     //initialize();
                     
@@ -553,52 +556,49 @@ public class NetworkGraph {
                     public void actionPerformed(ActionEvent arg0) {
                         
                         System.out.println("inside save");
-                        /*
-                        ImageIcon icon = new ImageIcon(GnwGuiSettings.getInstance().getMenuExitImage());
+                        
+                        ImageIcon icon = new ImageIcon(GnwGuiSettings.getInstance().getMitImage());
 
                         int n = JOptionPane.showConfirmDialog(
                                         new JFrame(),
-                                        "This process will lead to closing the current graph visualization "
-                                        + "and removing the icon of original network from the desktop to refresh.\n"
+                                        "After saving changes, the visualization will be refreshed and the original network will be displayed.\n"
+                                        + "To open the new version with changes, please click \"OPEN\".\n"
                                         + "Are you sure that you want to proceed?",
                                         "GNW message",
                                         JOptionPane.YES_NO_OPTION,
                                         JOptionPane.QUESTION_MESSAGE,
                                         icon);
 
-                        if (n == JOptionPane.YES_OPTION)
+                        if (n == JOptionPane.YES_OPTION){
                             // If the user selected YES
+                            /*
                             IONetwork.saveAs((NetworkElement) item_);
                             GnwGuiSettings.getInstance().getNetworkDesktop().removeItemFromDesktop(item_);
                             log_.log(Level.INFO, "The network " + item_.getLabel() + " and all its children have been deleted!");
                             JDialog topFrame = (JDialog) SwingUtilities.getWindowAncestor(screen_);
                             topFrame.dispose();
-                        */
-                        // export the network with changes
+                            */
                         
-                        IONetwork.saveAs((NetworkElement) item_);
-                        System.out.println("size of modified network is " + structure_.getSize());
-                    
-                        // update item_
-                        //structure_ = new Structure(tempStructure_);
-                        structure_ = tempStructure_.copy();
-                        System.out.println("size of original network is " + structure_.getSize());
+                            // export the network with changes
+
+                            IONetwork.saveAs((NetworkElement) item_);
+                            System.out.println("size of modified network is " + structure_.getSize());
+
+                            // update item_
+                            structure_ = tempStructure_.copy();
+                            System.out.println("size of original network is " + structure_.getSize());
+
+                            if (item_ instanceof StructureElement) {
+                                ((StructureElement)item_).setNetwork(new ImodNetwork(structure_));
+                            } else if (item_ instanceof DynamicalModelElement) {
+                                ((DynamicalModelElement)item_).setGeneNetwork(new GeneNetwork(structure_));
+                            }
+
+                            netSize_ = structure_.getSize();
+                            computeGraph();
+                            control_.resetControlSetting();
+                        }
                         
-                        if (item_ instanceof StructureElement) {
-                            ((StructureElement)item_).setNetwork((ImodNetwork)structure_);
-                            //structure_ = (.getNetwork();
-                        } else if (item_ instanceof DynamicalModelElement) {
-                            ((DynamicalModelElement)item_).setGeneNetwork((GeneNetwork)structure_);
-                        }
-                        /*
-                        if (item_ instanceof StructureElement) {
-                            ((StructureElement)item_).setNetwork((ImodNetwork)tempGraph_.structure_);
-                        } else if (item_ instanceof DynamicalModelElement) {
-                            ((DynamicalModelElement)item_).setGeneNetwork((GeneNetwork)tempGraph_.structure_);
-                        }
-                        */
-                        netSize_ = structure_.getSize();
-                        computeGraph();
 
 		   }
 	   });
@@ -1018,6 +1018,23 @@ public class NetworkGraph {
 					log_.log(Level.WARNING, "NetworkGraph::saveComponentAsJPEG(): " + e.getMessage(), e);
 				}
 		}
+                
+                public void resetControlSetting(){
+                    interactionMode();
+                    changeGraphLayout((String) layoutCombo_.getSelectedItem());
+                    
+                    dataVertices_ = new String[netSize_];
+                    for (int i=0; i < netSize_; i++) {
+                            dataVertices_[i] = structure_.getNode(i).getLabel();
+                    }
+                    search_.setData(dataVertices_);
+                    document_ = search_.getDocument();
+                    
+                    displayLabel();
+                    setEdgeOrCurvedLine();
+                    distinguishConnectionByColor();
+                    distinguishConnectionByArrowHead();
+                }
 		
 		
         // =======================================================================================
