@@ -246,6 +246,7 @@ public class NetworkGraph {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void computeGraph() {
 		
+            System.out.println("total nodes: " + structure_.getSize());
 		if (structure_.isDirected())
 			g_ = new DirectedSparseMultigraph<Node,Edge>();
 		else
@@ -484,18 +485,18 @@ public class NetworkGraph {
                     for (Iterator<Node> nodeIt = picked_nodes.iterator(); nodeIt.hasNext(); ) {
                         Node nodeToDelete = nodeIt.next();
                         System.out.println(nodeToDelete.getLabel());
-                        System.out.println("before: " + tempGraph.structure_.getSize());
-                        tempGraph.structure_.removeNode(nodeToDelete);
-                        System.out.println("after: " + tempGraph.structure_.getSize());                        
+                        System.out.println("before: " + structure_.getSize());
+                        structure_.removeNode(nodeToDelete);
+                        System.out.println("after: " + structure_.getSize());                        
                     }
                     
                     
                     // update item_
-                    if (tempGraph.item_ instanceof StructureElement) {
-                        ((StructureElement)tempGraph.item_).setNetwork((ImodNetwork)tempGraph.structure_);
+                    if (item_ instanceof StructureElement) {
+                        ((StructureElement)item_).setNetwork((ImodNetwork)structure_);
                         //structure_ = (.getNetwork();
-                    } else if (tempGraph.item_ instanceof DynamicalModelElement) {
-                        ((DynamicalModelElement)tempGraph.item_).setGeneNetwork((GeneNetwork)tempGraph.structure_);
+                    } else if (item_ instanceof DynamicalModelElement) {
+                        ((DynamicalModelElement)item_).setGeneNetwork((GeneNetwork)structure_);
                     }
 
                     // close current window
@@ -507,9 +508,14 @@ public class NetworkGraph {
                     tempGraph.screen_.setLayout(new BorderLayout());
                     tempGraph.computeGraph();
                     */
-                    tempGraph.initialize();
                     
-                    Options.viewNetwork(tempGraph.item_);
+                    netSize_ = structure_.getSize();
+                    computeGraph();
+            
+                    //initialize();
+                    
+                    //Options.viewNetwork(tempGraph.item_);
+                    
                     // export the temporary network with changes
                     //IONetwork.saveAs((NetworkElement) tempGraph.item_);                    
 
