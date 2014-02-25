@@ -557,7 +557,7 @@ public class NetworkGraph {
                         
                         System.out.println("inside save");
                         
-                        ImageIcon icon = new ImageIcon(GnwGuiSettings.getInstance().getMitImage());
+                        ImageIcon icon = new ImageIcon(GnwGuiSettings.getInstance().getStructureIcon());
 
                         int n = JOptionPane.showConfirmDialog(
                                         new JFrame(),
