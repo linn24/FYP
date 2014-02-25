@@ -102,7 +102,9 @@ import java.util.logging.Logger;
 import edu.uci.ics.screencap.EPSDump;
 import edu.uci.ics.screencap.PNGDump;
 import java.util.Set;
+import javax.swing.JDialog;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 
 /** Implements a graph visualization using the JUNG library.
@@ -549,6 +551,11 @@ public class NetworkGraph {
                         System.out.println("inside save");
                         // export the network with changes
                         IONetwork.saveAs((NetworkElement) item_);
+                        GnwGuiSettings.getInstance().getNetworkDesktop().removeItemFromDesktop(item_);
+                        log_.log(Level.INFO, "The network " + item_.getLabel() + " and all its children have been deleted!");
+                        JDialog topFrame = (JDialog) SwingUtilities.getWindowAncestor(screen_);
+                        topFrame.dispose();
+                        
                         System.out.println("size of modified network is " + structure_.getSize());
                     
                         // update item_
