@@ -86,6 +86,7 @@ import ch.epfl.lis.gnwgui.jungtransformers.EdgeTransformer;
 import ch.epfl.lis.gnwgui.jungtransformers.NodeFillColorTransformer;
 import ch.epfl.lis.gnwgui.jungtransformers.EdgeFillColorTransformer;
 import ch.epfl.lis.gnwgui.jungtransformers.NodeLabelLabeller;
+import ch.epfl.lis.gnwgui.windows.GnwGuiWindow;
 import ch.epfl.lis.gnwgui.windows.GraphViewerController;
 import ch.epfl.lis.imod.ImodNetwork;
 import ch.epfl.lis.utilities.filefilters.FilenameUtilities;
@@ -317,6 +318,7 @@ public class NetworkGraph {
         gm_.setMode(ModalGraphMouse.Mode.TRANSFORMING);
         vv_.setGraphMouse(gm_);
         
+            System.out.println("add actions");
         setScreen(vv_); // Draw the viewer into the panel displayed
         addPrintAction(screen_); // Add the key action ALT-P to print the JPanel screen_
         addDeleteAction(screen_); // Add the key action Delete to delete selected nodes
@@ -474,6 +476,7 @@ public class NetworkGraph {
                     // copy the current network into a temporary network
                     if (noChanges){
                         tempStructure_ = structure_.copy();
+                        noChanges = false;
                     }
                     /*
                     if (tempGraph_.item_ instanceof StructureElement) {
@@ -548,21 +551,45 @@ public class NetworkGraph {
 	   jp.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(k, "savechanges");
 	   jp.getActionMap().put("savechanges", new AbstractAction() {
                     public void actionPerformed(ActionEvent arg0) {
-                        System.out.println("inside save");
-                        // export the network with changes
-                        IONetwork.saveAs((NetworkElement) item_);
-                        GnwGuiSettings.getInstance().getNetworkDesktop().removeItemFromDesktop(item_);
-                        log_.log(Level.INFO, "The network " + item_.getLabel() + " and all its children have been deleted!");
-                        JDialog topFrame = (JDialog) SwingUtilities.getWindowAncestor(screen_);
-                        topFrame.dispose();
                         
+                        System.out.println("inside save");
+                        /*
+                        ImageIcon icon = new ImageIcon(GnwGuiSettings.getInstance().getMenuExitImage());
+
+                        int n = JOptionPane.showConfirmDialog(
+                                        new JFrame(),
+                                        "This process will lead to closing the current graph visualization "
+                                        + "and removing the icon of original network from the desktop to refresh.\n"
+                                        + "Are you sure that you want to proceed?",
+                                        "GNW message",
+                                        JOptionPane.YES_NO_OPTION,
+                                        JOptionPane.QUESTION_MESSAGE,
+                                        icon);
+
+                        if (n == JOptionPane.YES_OPTION)
+                            // If the user selected YES
+                            IONetwork.saveAs((NetworkElement) item_);
+                            GnwGuiSettings.getInstance().getNetworkDesktop().removeItemFromDesktop(item_);
+                            log_.log(Level.INFO, "The network " + item_.getLabel() + " and all its children have been deleted!");
+                            JDialog topFrame = (JDialog) SwingUtilities.getWindowAncestor(screen_);
+                            topFrame.dispose();
+                        */
+                        // export the network with changes
+                        
+                        IONetwork.saveAs((NetworkElement) item_);
                         System.out.println("size of modified network is " + structure_.getSize());
                     
                         // update item_
                         //structure_ = new Structure(tempStructure_);
                         structure_ = tempStructure_.copy();
                         System.out.println("size of original network is " + structure_.getSize());
-                    
+                        
+                        if (item_ instanceof StructureElement) {
+                            ((StructureElement)item_).setNetwork((ImodNetwork)structure_);
+                            //structure_ = (.getNetwork();
+                        } else if (item_ instanceof DynamicalModelElement) {
+                            ((DynamicalModelElement)item_).setGeneNetwork((GeneNetwork)structure_);
+                        }
                         /*
                         if (item_ instanceof StructureElement) {
                             ((StructureElement)item_).setNetwork((ImodNetwork)tempGraph_.structure_);
