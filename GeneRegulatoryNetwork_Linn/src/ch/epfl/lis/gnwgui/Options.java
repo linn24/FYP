@@ -379,13 +379,13 @@ public class Options extends OptionsWindow
                         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
                         //Create and set up the content pane.
-                        JComponent newContentPane = new TimeSeriesSelection(item_.getLabel());
-                        newContentPane.setOpaque(true); //content panes must be opaque
-                        frame.setContentPane(newContentPane);
+                        TimeSeriesSelection tss = new TimeSeriesSelection(GnwGuiSettings.getInstance().getGnwGui().getFrame(), item_);
+                        //newContentPane.setOpaque(true); //content panes must be opaque
+                        //frame.setContentPane(newContentPane);
 
                         //Display the window.
-                        frame.pack();
-                        frame.setVisible(true);
+                        //frame.pack();
+                        //frame.setVisible(true);
 
                 }
                 else

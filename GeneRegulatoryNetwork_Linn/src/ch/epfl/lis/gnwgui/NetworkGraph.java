@@ -644,7 +644,7 @@ public class NetworkGraph {
 		private static final long serialVersionUID = 1L;
 		
 		/** 2 graph modes: transforming and picking. */
-		private String[] interactionModeList_ = {"Move graph", "Move nodes", "Edit"};
+		private String[] interactionModeList_ = {"Move graph", "Move nodes/Edit"};
 		/** */
 		private String[] layoutList_ = {"KK layout", "FR layout", "Circle layout"};
 		/** A listener on this document will customize the search box. */
@@ -880,8 +880,6 @@ public class NetworkGraph {
 				setGraphMouseMode(0);
 			} else if (interactionMode_.getSelectedIndex() == 1) { // Picking mode
 				setGraphMouseMode(1);
-                        } else if (interactionMode_.getSelectedIndex() == 2) { // Picking mode
-				setGraphMouseMode(2);
                         }
 		}
 		
