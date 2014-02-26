@@ -40,6 +40,7 @@ import java.io.File;
 import java.util.Vector;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -58,7 +59,7 @@ public class TimeSeriesSelectionWindow extends GenericWindow
 	/** Serialization */
 	private static final long serialVersionUID = 1L;
 	
-	protected JPanel optionsPanel_;
+	protected JPanel filePanel_, timeseriesPanel_, genePanel_;
 	
         protected JLabel fileName_, timeSeriesName_, geneName_;
         protected JComboBox fileList_, timeSeriesList_;
@@ -83,10 +84,20 @@ public class TimeSeriesSelectionWindow extends GenericWindow
 		setTitle("Select Time Series");
                 setLocationRelativeTo(GnwGuiSettings.getInstance().getGnwGui().getFrame());
 
-		optionsPanel_ = new JPanel();
-		optionsPanel_.setBackground(Color.WHITE);
-		optionsPanel_.setLayout(new GridLayout(0,2));
-		optionsPanel_.setPreferredSize(new Dimension(0, 0));
+		filePanel_ = new JPanel();
+		filePanel_.setBackground(Color.WHITE);
+		filePanel_.setLayout(new GridLayout(0,2));
+		filePanel_.setPreferredSize(new Dimension(0, 0));
+                
+                timeseriesPanel_ = new JPanel();
+		timeseriesPanel_.setBackground(Color.WHITE);
+		timeseriesPanel_.setLayout(new GridLayout(0,2));
+		timeseriesPanel_.setPreferredSize(new Dimension(0, 0));
+                
+                genePanel_ = new JPanel();
+		genePanel_.setBackground(Color.WHITE);
+		genePanel_.setLayout(new GridLayout(0,2));
+		genePanel_.setPreferredSize(new Dimension(0, 0));
                 
                 Vector<String> vFiles = new Vector<String>();
                 vFiles = this.populateFileOptions();
@@ -104,32 +115,37 @@ public class TimeSeriesSelectionWindow extends GenericWindow
                 timeSeriesName_ = new JLabel();
                 geneName_ = new JLabel();
 
-                fileName_.setFont(fileName_.getFont().deriveFont(Font.ITALIC));
+                fileName_.setFont(fileName_.getFont().deriveFont(Font.BOLD));
                 fileName_.setHorizontalAlignment(JLabel.CENTER);
-
                 fileName_.setBorder(BorderFactory.createEmptyBorder(10,0,0,0));
                 fileName_.setText("Select File");
 
-                timeSeriesName_.setFont(fileName_.getFont().deriveFont(Font.ITALIC));
+                timeSeriesName_.setFont(timeSeriesName_.getFont().deriveFont(Font.BOLD));
                 timeSeriesName_.setHorizontalAlignment(JLabel.CENTER);
                 timeSeriesName_.setBorder(BorderFactory.createEmptyBorder(10,0,0,0));
                 timeSeriesName_.setText("Select Time Series");
 
-                geneName_.setFont(fileName_.getFont().deriveFont(Font.ITALIC));
+                geneName_.setFont(geneName_.getFont().deriveFont(Font.BOLD));
                 geneName_.setHorizontalAlignment(JLabel.CENTER);
                 geneName_.setBorder(BorderFactory.createEmptyBorder(10,0,0,0));
                 geneName_.setText("Select Gene");
                 
-                optionsPanel_.add(fileName_);
-                optionsPanel_.add(fileList_);
-                optionsPanel_.add(timeSeriesName_);
-                optionsPanel_.add(timeSeriesList_);
-                optionsPanel_.add(geneName_);        
-                optionsPanel_.add(scrollPane_);
-                optionsPanel_.setBorder(BorderFactory.createEmptyBorder(20,20,20,20));
-                        
-                getContentPane().add(optionsPanel_);
-
+                filePanel_.add(fileName_);
+                filePanel_.add(fileList_);
+                filePanel_.setBorder(BorderFactory.createEmptyBorder(20,20,20,20));
+                
+                timeseriesPanel_.add(timeSeriesName_);
+                timeseriesPanel_.add(timeSeriesList_);
+                timeseriesPanel_.setBorder(BorderFactory.createEmptyBorder(20,20,20,20));
+                
+                genePanel_.add(geneName_);        
+                genePanel_.add(scrollPane_);
+                genePanel_.setBorder(BorderFactory.createEmptyBorder(20,20,20,20));
+                
+                getContentPane().setLayout(new GridLayout(0,1));
+		getContentPane().add(filePanel_);
+                getContentPane().add(timeseriesPanel_);
+                getContentPane().add(genePanel_);
 	}
         
         private Vector<String> populateFileOptions(){

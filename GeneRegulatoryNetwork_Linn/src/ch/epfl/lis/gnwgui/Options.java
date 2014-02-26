@@ -202,7 +202,15 @@ public class Options extends OptionsWindow
 		{
 			public void actionPerformed(final ActionEvent arg0)
 			{
-				visualizeTimeSeries();                                
+				visualizeTimeSeries(false);                                
+			}
+		});
+                
+                bCompare_.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(final ActionEvent arg0)
+			{
+				visualizeTimeSeries(true);                                
 			}
 		});
 	}
@@ -360,7 +368,7 @@ public class Options extends OptionsWindow
 	
 	/** Open a dialog to choose the type of time series to visualize. */
         
-        public void visualizeTimeSeries()
+        public void visualizeTimeSeries(boolean compareData)
         {            
                 System.out.println("Implementing in progress...");
                 System.out.println(item_.getLabel());
@@ -374,19 +382,13 @@ public class Options extends OptionsWindow
                 {                    
                         //** if so, display window to select time series type
                         dispose();
-                        //Create and set up the window.
-                        JFrame frame = new JFrame("Select Dataset");
-                        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
-                        //Create and set up the content pane.
-                        TimeSeriesSelection tss = new TimeSeriesSelection(GnwGuiSettings.getInstance().getGnwGui().getFrame(), item_);
-                        //newContentPane.setOpaque(true); //content panes must be opaque
-                        //frame.setContentPane(newContentPane);
-
-                        //Display the window.
-                        //frame.pack();
-                        tss.setVisible(true);
-
+                        if (compareData){
+                            TimeSeriesComparer tsm = new TimeSeriesComparer(GnwGuiSettings.getInstance().getGnwGui().getFrame(), item_);
+                            tsm.setVisible(true);
+                        }else{
+                            TimeSeriesSelection tss = new TimeSeriesSelection(GnwGuiSettings.getInstance().getGnwGui().getFrame(), item_);
+                            tss.setVisible(true);
+                        }
                 }
                 else
                 {                        //** if not, prompt to generate dataset first
@@ -423,6 +425,7 @@ public class Options extends OptionsWindow
 			bottomPanel_.add(bKinetic_);
 			bottomPanel_.add(bDatasets_);
                         topPanel_.add(bTimeSeries_);
+                        topPanel_.add(bCompare_);
 			bottomPanel_.add(bDelete_);
 			bottomPanel_.add(bExport_);
 		}

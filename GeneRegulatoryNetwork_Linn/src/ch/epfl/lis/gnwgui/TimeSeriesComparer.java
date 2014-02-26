@@ -11,6 +11,7 @@ package ch.epfl.lis.gnwgui;
 
 import ch.epfl.lis.gnw.GeneNetwork;
 import ch.epfl.lis.gnwgui.idesktop.IElement;
+import ch.epfl.lis.gnwgui.windows.TimeSeriesComparerWindow;
 import ch.epfl.lis.gnwgui.windows.TimeSeriesSelectionWindow;
 import ch.epfl.lis.imod.ImodNetwork;
 import java.awt.*;
@@ -22,14 +23,14 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 
-public class TimeSeriesSelection extends TimeSeriesSelectionWindow {
+public class TimeSeriesComparer extends TimeSeriesComparerWindow {
     TimeSeriesVisualizer visualizer_ = null;
     Vector<String> genes = new Vector<String>();
     Vector<String> timeSeries = new Vector<String>();
     int totalTimeSeries;
     
     
-    public TimeSeriesSelection(Frame aFrame, IElement item) {
+    public TimeSeriesComparer(Frame aFrame, IElement item) {
         super(aFrame, item);
         visualizer_ = new TimeSeriesVisualizer(GnwGuiSettings.getInstance().getGnwGui().getFrame());
     

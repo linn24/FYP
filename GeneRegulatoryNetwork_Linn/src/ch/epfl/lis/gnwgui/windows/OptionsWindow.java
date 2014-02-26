@@ -65,6 +65,7 @@ public class OptionsWindow extends GenericWindow
 	protected JButton bKinetic_;
 	protected JButton bDatasets_;
         protected JButton bTimeSeries_;
+        protected JButton bCompare_;
 
 	/** This panel is displayed in the main and contains neither dynamicNetDisplay_ or staticNetDisplay_. */
 	protected JPanel mainDisplay_;
@@ -154,7 +155,13 @@ public class OptionsWindow extends GenericWindow
 		bTimeSeries_.setText("<html><center>Visualize<br>Time Series Data</center></html>");
                 topPanel_.add(bTimeSeries_);
 		//bottomPanel_.add(bTimeSeries_);
-
+                
+                bCompare_ = new JButton();
+		bCompare_.setPreferredSize(new Dimension(100, 80));
+		bCompare_.setMargin(new Insets(2, 0, 2, 0));
+		bCompare_.setText("<html><center>Compare<br>Time Series Data</center></html>");
+                topPanel_.add(bCompare_);
+		
 		bDelete_ = new JButton();
 		bDelete_.setPreferredSize(new Dimension(100, 80));
 		bDelete_.setMargin(new Insets(2, 0, 2, 0));
