@@ -385,7 +385,7 @@ public class Options extends OptionsWindow
 
                         //Display the window.
                         //frame.pack();
-                        //frame.setVisible(true);
+                        tss.setVisible(true);
 
                 }
                 else

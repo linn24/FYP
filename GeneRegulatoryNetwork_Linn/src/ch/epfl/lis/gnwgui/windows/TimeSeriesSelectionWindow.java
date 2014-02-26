@@ -33,6 +33,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Frame;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -84,7 +85,7 @@ public class TimeSeriesSelectionWindow extends GenericWindow
 
 		optionsPanel_ = new JPanel();
 		optionsPanel_.setBackground(Color.WHITE);
-		optionsPanel_.setLayout(new SpringLayout());
+		optionsPanel_.setLayout(new GridLayout(0,2));
 		optionsPanel_.setPreferredSize(new Dimension(0, 0));
                 
                 Vector<String> vFiles = new Vector<String>();

@@ -9,8 +9,10 @@ package ch.epfl.lis.gnwgui;
  * @author LinnHtet24
  */
 
+import ch.epfl.lis.gnw.GeneNetwork;
 import ch.epfl.lis.gnwgui.idesktop.IElement;
 import ch.epfl.lis.gnwgui.windows.TimeSeriesSelectionWindow;
+import ch.epfl.lis.imod.ImodNetwork;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
@@ -34,7 +36,8 @@ public class TimeSeriesSelection extends TimeSeriesSelectionWindow {
         //this.networkLabel = networkLabel;
 
         //visualizer_.displayGraph(networkLabel + "_" + options[optionList.getSelectedIndex()] + ".tsv");
-        visualizer_.setHeaderInfo(item_.getLabel());
+        visualizer_.setHeaderInfo(getHeaderInfo());
+        setHeaderInfo(getHeaderInfo());
         
         fileList_.addActionListener(
                 new ActionListener(){
@@ -136,6 +139,17 @@ public class TimeSeriesSelection extends TimeSeriesSelectionWindow {
         System.out.println("timeSeriesList: " + timeSeriesList_.getSelectedIndex() + " is selected.");
         
         
+    }
+    
+    private String getHeaderInfo(){
+        String title1, title2;
+        title1 = title2 = "";
+
+        GeneNetwork geneNetwork = ((DynamicalModelElement)item_).getGeneNetwork();
+        title1 = item_.getLabel();
+        title2 = geneNetwork.getSize() + " genes, " + geneNetwork.getNumEdges() + " interactions";
+        
+        return title1 + " (" + title2 + ")";
     }
 
 }
