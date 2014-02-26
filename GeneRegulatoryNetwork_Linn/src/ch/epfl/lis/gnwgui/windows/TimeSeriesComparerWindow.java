@@ -102,11 +102,10 @@ public class TimeSeriesComparerWindow extends TimeSeriesSelectionWindow
                 numOfWindowPanel_.add(oneWin_);
                 numOfWindowPanel_.add(twoWin_);
                 
-                
+                selectVersion_ = new JLabel("Select Version to compare");
                 selectVersion_.setFont(selectVersion_.getFont().deriveFont(Font.BOLD));
                 selectVersion_.setHorizontalAlignment(JLabel.CENTER);
                 selectVersion_.setBorder(BorderFactory.createEmptyBorder(10,0,0,0));
-                selectVersion_.setText("Select Version to compare");
                 
                 bOpen_ = new JButton("Open");
                 bOpen_.setMargin(new Insets(2, 0, 2, 0));
