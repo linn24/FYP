@@ -10,17 +10,31 @@ package ch.epfl.lis.gnwgui;
  */
 
 import ch.epfl.lis.gnw.GeneNetwork;
+import ch.epfl.lis.gnw.GnwSettings;
 import ch.epfl.lis.gnwgui.idesktop.IElement;
 import ch.epfl.lis.gnwgui.windows.TimeSeriesComparerWindow;
-import ch.epfl.lis.gnwgui.windows.TimeSeriesSelectionWindow;
+import ch.epfl.lis.gnwgui.windows.Wait;
 import ch.epfl.lis.imod.ImodNetwork;
+import ch.epfl.lis.networks.ios.ParseException;
+import ch.epfl.lis.utilities.filefilters.FilenameUtilities;
+import ch.epfl.lis.utilities.filefilters.FilterGnwDesktopZIP;
+import ch.epfl.lis.utilities.filefilters.FilterNetworkAll;
+import ch.epfl.lis.utilities.filefilters.FilterNetworkDOT;
+import ch.epfl.lis.utilities.filefilters.FilterNetworkGML;
+import ch.epfl.lis.utilities.filefilters.FilterNetworkSBML;
+import ch.epfl.lis.utilities.filefilters.FilterNetworkTSVDREAMTSV;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.net.URL;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.filechooser.FileFilter;
 
 
 public class TimeSeriesComparer extends TimeSeriesComparerWindow {
@@ -28,7 +42,11 @@ public class TimeSeriesComparer extends TimeSeriesComparerWindow {
     Vector<String> genes = new Vector<String>();
     Vector<String> timeSeries = new Vector<String>();
     int totalTimeSeries;
+    protected static NetworkElement itemToCompare_ = null;
     
+    /** Logger for this class */
+    private static Logger log_ = Logger.getLogger(IONetwork.class.getName());
+
     
     public TimeSeriesComparer(Frame aFrame, IElement item) {
         super(aFrame, item);
@@ -40,6 +58,19 @@ public class TimeSeriesComparer extends TimeSeriesComparerWindow {
         //visualizer_.displayGraph(networkLabel + "_" + options[optionList.getSelectedIndex()] + ".tsv");
         visualizer_.setHeaderInfo(getHeaderInfo());
         setHeaderInfo(getHeaderInfo());
+        
+        bOpen_.addActionListener(
+                new ActionListener(){
+
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        open();
+                        updateCombo(item_.getLabel() + "_" + fileList_.getSelectedItem().toString());
+        
+                    }
+                    
+                }
+            );
         
         fileList_.addActionListener(
                 new ActionListener(){
@@ -75,7 +106,11 @@ public class TimeSeriesComparer extends TimeSeriesComparerWindow {
     
     
     protected void updateCombo(String name) {
+        visualizer_.clearDataLists();
         visualizer_.readFile(name + ".tsv");
+        if (itemToCompare_ != null){
+            visualizer_.readFile(itemToCompare_.getLabel() + "_" + fileList_.getSelectedItem().toString() + ".tsv");
+        }
         totalTimeSeries = visualizer_.getTotalTimeSeries();
         timeSeries.clear();
         
@@ -157,6 +192,139 @@ public class TimeSeriesComparer extends TimeSeriesComparerWindow {
         title2 = geneNetwork.getSize() + " genes, " + geneNetwork.getNumEdges() + " interactions";
         
         return title1 + " (" + title2 + ")";
+    }
+
+    
+    
+    // functions to select different versions
+    public static void open()
+    {
+        IODialog dialog = new IODialog(GnwGuiSettings.getInstance().getGnwGui().getFrame(), "Open Network",
+                        GnwSettings.getInstance().getOutputDirectory(), IODialog.LOAD);
+
+        //dialog.addFilter(new FilterNetworkTSVDREAMTSV());
+        //		dialog.addFilter(new FilterNetworkTSVDREAM());
+        //dialog.addFilter(new FilterNetworkGML());
+        //dialog.addFilter(new FilterNetworkDOT());
+        dialog.addFilter(new FilterNetworkSBML());
+        //dialog.addFilter(new FilterGnwDesktopZIP());
+        //dialog.addFilter(new FilterNetworkAll());
+
+        dialog.setAcceptAllFileFilterUsed(false);
+        dialog.display();
+
+        Wait wait = new Wait(GnwGuiSettings.getInstance().getGnwGui().getFrame(), true);
+        wait.setTitle("Open Network");
+        TimeSeriesComparer.NetworkImport ni = new TimeSeriesComparer.NetworkImport(wait);
+
+        ni.fileAbsPath_ = dialog.getSelection();
+        ni.f_ = dialog.getSelectedFilter();
+
+        ni.execute();
+        wait.start();
+    }
+    
+    public static void open(String absPath, FileFilter f)
+    {
+            try
+            {
+                    if (absPath != null)
+                    {
+                            String dir = FilenameUtilities.getDirectory(absPath);
+                            String filename = FilenameUtilities.getFilenameWithoutPath(absPath);
+                            URL url = GnwSettings.getInstance().getURL(absPath);
+
+                            if (f == null || f instanceof FilterNetworkSBML){
+                                    itemToCompare_ = new NetworkElement(loadItem(filename, url, GeneNetwork.SBML));
+                            }else{
+                                    throw new Exception("Selected format unhandled!");
+                            }
+                            // Save the current path as user path
+                            GnwSettings.getInstance().setOutputDirectory(dir);
+                                    
+                    }
+            }
+            catch (FileNotFoundException e)
+            {
+                    IONetwork.openingFailedDialog("GNW Message", absPath, "File not found!");
+                    log_.log(Level.WARNING, "TimeSeriesComparer::open(): " + e.getMessage(), e);
+            }
+            catch (ParseException e)
+            {
+                    IONetwork.openingFailedDialog("GNW Message", absPath, "Error occurs during parsing.<br>" +
+                    "See logs for more information.");
+                    log_.log(Level.WARNING, "TimeSeriesComparer::open(): " + e.getMessage(), e);
+            }
+            catch (Exception e)
+            {
+                    IONetwork.openingFailedDialog("GNW Message", absPath, "Unhandled exception!<br>" +
+                    "See logs for more information.");
+                    log_.log(Level.WARNING, "TimeSeriesComparer::open(): " + e.getMessage(), e);
+            }
+            
+    }
+
+    public static NetworkElement loadItem(String name, URL absPath, Integer format) throws 	FileNotFoundException, ParseException, Exception
+    {
+            if (name.equals("") || name.charAt(0) == '#')
+                    name = FilenameUtilities.getFilenameWithoutPath(absPath.getPath());
+            name = FilenameUtilities.getFilenameWithoutExtension(name);
+
+            if ( IONetwork.isDynamicalNetworkFormat(format = IONetwork.isDynamicalNetworkExtension(absPath, format)) )
+            {
+
+                    DynamicalModelElement grn = IONetwork.loadDynamicNetworkItem(name, absPath, format);
+
+                    IONetwork.printOpeningInfo(grn);
+
+                    return grn;
+            }
+            else
+                    throw new Exception("Unkown network format!");
+    }
+
+
+
+    // PRIVATE CLASSES
+
+    private static class NetworkImport extends SwingWorker<Void, Void>
+    {
+        /** Dialog displayed during the process */
+        private Wait wDialog_;
+
+        /** Absolute path to the network file */
+        private String fileAbsPath_;
+
+        /** FileFilter selected (information about the type of network to load) */
+        private FileFilter f_;
+
+        // ----------------------------------------------------------------------------
+        // PUBLIC METHODS
+
+        public NetworkImport(Wait gui)
+        {
+                this.wDialog_ = gui;
+        }
+
+        // ----------------------------------------------------------------------------
+        // PROTECTED METHODS
+
+        @Override
+        protected Void doInBackground() throws Exception
+        {
+
+                open(fileAbsPath_, f_);
+
+                return null;
+        }
+
+        // ----------------------------------------------------------------------------
+
+        @Override
+        protected void done()
+        {
+                wDialog_.stop();
+        }
     }
 
 }
