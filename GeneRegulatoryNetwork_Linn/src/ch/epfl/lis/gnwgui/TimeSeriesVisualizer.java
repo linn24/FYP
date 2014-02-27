@@ -22,6 +22,7 @@ public class TimeSeriesVisualizer extends TimeSeriesVisualizerWindow {
     final int PAD = 80;
     static Vector<double[]> lstData = new Vector<double[]>();
     static String[] genes;
+    //static Vector<String> genes = new Vector<String>();
     TimeSeriesVisualizer graphWindow;
     MyTimeSeriesGraph graph;
         
@@ -56,6 +57,7 @@ public class TimeSeriesVisualizer extends TimeSeriesVisualizerWindow {
             double[] arrDoubleTS;
             int numOfTimeSeries = 0;
             String timeStamp = "";
+            String[] arrGenes;
             
             //Read File Line By Line
             while ((strLine = br.readLine()) != null)   {
@@ -77,6 +79,14 @@ public class TimeSeriesVisualizer extends TimeSeriesVisualizerWindow {
                     //System.out.println("after:" + strLine);
 
                     if (numOfTimeSeries == 0){
+                        /*
+                        arrGenes = strLine.split("\t");
+                        if(arrGenes.length != genes.size()){
+                            for (int i = 0; i < arrGenes.length; i++){
+                                genes.add(arrGenes[i]);
+                            }
+                        }
+                        */
                         genes = strLine.split("\t");
                         System.out.println("total genes: " + genes.length);
                     }else {//if (numOfTimeSeries == 1){                        
@@ -157,7 +167,8 @@ public class TimeSeriesVisualizer extends TimeSeriesVisualizerWindow {
     public void getGenes(Vector<String> vGenes){
         for (int i = 0; i < genes.length; i++){
             vGenes.add(genes[i]);
-        }        
+        }
+        
     }
     
     public int getTotalTimeSeries(){
