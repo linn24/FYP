@@ -15,6 +15,7 @@ import java.awt.font.*;
 import java.awt.geom.*;
 import javax.swing.*;
 import java.io.*;
+import java.util.Arrays;
 import java.util.Vector;
 
 
@@ -40,6 +41,14 @@ public class TimeSeriesVisualizer extends TimeSeriesVisualizerWindow {
         lstData = new Vector<double[]>();
         lstFixedData = new Vector<double[]>();
     
+    }
+    
+    
+    public static String[] append(String[] arr, String element) {
+        final int N = arr.length;
+        arr = Arrays.copyOf(arr, N + 1);
+        arr[N] = element;
+        return arr;
     }
     
     public static void readFile(String fileName){
@@ -87,7 +96,14 @@ public class TimeSeriesVisualizer extends TimeSeriesVisualizerWindow {
                             }
                         }
                         */
-                        genes = strLine.split("\t");
+                        if(genes.length == 0){
+                            genes = strLine.split("\t");
+                        }else{
+                            arrGenes = strLine.split("\t");
+                            for (int i = 0; i < arrGenes.length; i++){
+                                genes = append(genes, arrGenes[i]);
+                            }
+                        }                        
                         System.out.println("total genes: " + genes.length);
                     }else {//if (numOfTimeSeries == 1){                        
                         if(!lstTimeStamp.contains(timeStamp)){

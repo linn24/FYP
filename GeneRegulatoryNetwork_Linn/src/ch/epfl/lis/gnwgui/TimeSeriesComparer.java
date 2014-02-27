@@ -109,6 +109,7 @@ public class TimeSeriesComparer extends TimeSeriesComparerWindow {
         visualizer_.clearDataLists();
         visualizer_.readFile(name + ".tsv");
         if (itemToCompare_ != null){
+            System.out.println("compare");
             visualizer_.readFile(itemToCompare_.getLabel() + "_" + fileList_.getSelectedItem().toString() + ".tsv");
         }
         totalTimeSeries = visualizer_.getTotalTimeSeries();
