@@ -35,12 +35,15 @@ public class TimeSeriesVisualizer extends TimeSeriesVisualizerWindow {
         super(aFrame);
     }
     
+    public void clearDataLists(){
+        lstData = new Vector<double[]>();
+        lstFixedData = new Vector<double[]>();
+    
+    }
     
     public static void readFile(String fileName){
         try{
-            lstData = new Vector<double[]>();
-            lstFixedData = new Vector<double[]>();
-    
+            
             // Open the file that is the first 
             // command line parameter
             FileInputStream fstream = new FileInputStream(fileName);

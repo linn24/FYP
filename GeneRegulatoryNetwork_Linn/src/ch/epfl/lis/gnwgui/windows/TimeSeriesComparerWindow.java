@@ -55,11 +55,10 @@ public class TimeSeriesComparerWindow extends TimeSeriesSelectionWindow
 	/** Serialization */
 	private static final long serialVersionUID = 1L;
 	
-	protected JPanel numOfWindowPanel_;
-	protected JPanel selectPanel_;
+	protected JPanel numOfWindowPanel_, versionPanel_, displayPanel_;
         
         protected JRadioButton oneWin_, twoWin_;
-        protected JLabel selectVersion_;
+        protected JLabel selectVersion_, selectDisplay_;
         protected JButton bOpen_;
 	
 	
@@ -78,44 +77,64 @@ public class TimeSeriesComparerWindow extends TimeSeriesSelectionWindow
 		setTitle("Compare Different Versions of Time Series");
                 setLocationRelativeTo(GnwGuiSettings.getInstance().getGnwGui().getFrame());
 
-		selectPanel_ = new JPanel();
-		selectPanel_.setBackground(Color.WHITE);
-		selectPanel_.setLayout(new GridLayout(0,2));
-		selectPanel_.setPreferredSize(new Dimension(0, 0));
-                getContentPane().add(selectPanel_);
+		versionPanel_ = new JPanel();
+		versionPanel_.setBackground(Color.WHITE);
+		versionPanel_.setLayout(new GridLayout(0,2));
+		versionPanel_.setPreferredSize(new Dimension(0, 0));
+                versionPanel_.setBorder(BorderFactory.createEmptyBorder(20,20,20,20));                
+                getContentPane().add(versionPanel_);
 
                 numOfWindowPanel_ = new JPanel();
 		numOfWindowPanel_.setBackground(Color.WHITE);
 		numOfWindowPanel_.setLayout(new GridLayout(0,2));
 		numOfWindowPanel_.setPreferredSize(new Dimension(0, 0));
-                getContentPane().add(numOfWindowPanel_);
+                
+                displayPanel_ = new JPanel();
+		displayPanel_.setBackground(Color.WHITE);
+		displayPanel_.setLayout(new GridLayout(0,2));
+		displayPanel_.setPreferredSize(new Dimension(0, 0));
+                displayPanel_.setBorder(BorderFactory.createEmptyBorder(20,20,20,20));            
+                getContentPane().add(displayPanel_);
 
                 ButtonGroup buttonGroup = new ButtonGroup();
-                oneWin_ = new JRadioButton("Display in one window");
+                oneWin_ = new JRadioButton("In one window");
                 oneWin_.setFont(oneWin_.getFont().deriveFont(Font.BOLD));
-                twoWin_ = new JRadioButton("Display in two windows");
+                oneWin_.setHorizontalAlignment(JRadioButton.CENTER);
+                oneWin_.setBackground(Color.WHITE);
+                twoWin_ = new JRadioButton("In two windows");
                 twoWin_.setFont(oneWin_.getFont().deriveFont(Font.BOLD));
+                twoWin_.setHorizontalAlignment(JRadioButton.CENTER);
+                twoWin_.setBackground(Color.WHITE);
                 oneWin_.setSelected(true);
                 buttonGroup.add(oneWin_);
                 buttonGroup.add(twoWin_);
+                                
+                selectDisplay_ = new JLabel("Select Display");
+                selectDisplay_.setFont(selectDisplay_.getFont().deriveFont(Font.BOLD));
+                selectDisplay_.setHorizontalAlignment(JLabel.CENTER);
+                
                 
                 numOfWindowPanel_.add(oneWin_);
                 numOfWindowPanel_.add(twoWin_);
                 
+                displayPanel_.add(selectDisplay_);
+                displayPanel_.add(numOfWindowPanel_);
+                
                 selectVersion_ = new JLabel("Select Version to compare");
                 selectVersion_.setFont(selectVersion_.getFont().deriveFont(Font.BOLD));
                 selectVersion_.setHorizontalAlignment(JLabel.CENTER);
-                selectVersion_.setBorder(BorderFactory.createEmptyBorder(10,0,0,0));
+                selectVersion_.setBorder(BorderFactory.createEmptyBorder(20,20,20,20));
                 
                 bOpen_ = new JButton("Open");
                 bOpen_.setMargin(new Insets(2, 0, 2, 0));
-		bOpen_.setPreferredSize(new Dimension(100, 80));
+                bOpen_.setHorizontalAlignment(JButton.CENTER);
+		bOpen_.setPreferredSize(new Dimension(200, 80));
 		
                 
-                selectPanel_.add(selectVersion_);
-                selectPanel_.add(bOpen_);
+                versionPanel_.add(selectVersion_);
+                versionPanel_.add(bOpen_);
                 
-                getContentPane().add(selectPanel_);
-                getContentPane().add(numOfWindowPanel_);
+                getContentPane().add(versionPanel_);
+                getContentPane().add(displayPanel_);
 	}
 }

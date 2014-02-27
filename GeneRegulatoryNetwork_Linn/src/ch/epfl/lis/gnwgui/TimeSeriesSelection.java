@@ -74,6 +74,7 @@ public class TimeSeriesSelection extends TimeSeriesSelectionWindow {
     
     
     protected void updateCombo(String name) {
+        visualizer_.clearDataLists();
         visualizer_.readFile(name + ".tsv");
         totalTimeSeries = visualizer_.getTotalTimeSeries();
         timeSeries.clear();

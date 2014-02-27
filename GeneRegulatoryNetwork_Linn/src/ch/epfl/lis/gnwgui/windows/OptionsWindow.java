@@ -82,7 +82,7 @@ public class OptionsWindow extends GenericWindow
 	public OptionsWindow(Frame aFrame)
 	{	
 		super(aFrame, true);
-		setBounds(100, 100, 500, 340);
+		setBounds(100, 100, 620, 340);
 
 		mainDisplay_ = new JPanel();
 		mainDisplay_.setLayout(mainDisplayLayout_);
