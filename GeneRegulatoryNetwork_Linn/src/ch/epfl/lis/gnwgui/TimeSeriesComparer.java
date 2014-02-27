@@ -52,7 +52,7 @@ public class TimeSeriesComparer extends TimeSeriesComparerWindow {
         super(aFrame, item);
         visualizer_ = new TimeSeriesVisualizer(GnwGuiSettings.getInstance().getGnwGui().getFrame());
     
-
+        itemToCompare_ = null;
         //this.networkLabel = networkLabel;
 
         //visualizer_.displayGraph(networkLabel + "_" + options[optionList.getSelectedIndex()] + ".tsv");
@@ -64,8 +64,13 @@ public class TimeSeriesComparer extends TimeSeriesComparerWindow {
 
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        open();
-                        updateCombo(item_.getLabel() + "_" + fileList_.getSelectedItem().toString());
+                        open();     
+                        if (itemToCompare_ != null){
+                            System.out.println("compare");
+                            visualizer_.clearDataLists();
+                            visualizer_.readFile(itemToCompare_.getLabel() + "_" + fileList_.getSelectedItem().toString() + ".tsv");
+                        }
+                        updateCombo();
         
                     }
                     
@@ -78,7 +83,12 @@ public class TimeSeriesComparer extends TimeSeriesComparerWindow {
                         visualizer_.graphWindow.dispose();
                         JComboBox cb = (JComboBox)e.getSource();
                         String fileName = (String)cb.getSelectedItem();
-                        updateCombo(item_.getLabel() + "_" + fileName);
+                        visualizer_.clearDataLists();        
+                        if(itemToCompare_ != null){
+                            visualizer_.readFile(itemToCompare_.getLabel() + "_" + fileList_.getSelectedItem().toString() + ".tsv");
+                        }
+                        visualizer_.readFile(item_.getLabel() + "_" + fileName + ".tsv");
+                        updateCombo();
 
                     }
                 }
@@ -99,19 +109,16 @@ public class TimeSeriesComparer extends TimeSeriesComparerWindow {
             geneList_.setSelectedIndex(0);
         }
         
-        updateCombo(item_.getLabel() + "_" + fileList_.getSelectedItem().toString());
+        visualizer_.clearDataLists();        
+        visualizer_.readFile(item_.getLabel() + "_" + fileList_.getSelectedItem().toString() + ".tsv");
+        updateCombo();
         
     }
 
     
     
-    protected void updateCombo(String name) {
-        visualizer_.clearDataLists();
-        visualizer_.readFile(name + ".tsv");
-        if (itemToCompare_ != null){
-            System.out.println("compare");
-            visualizer_.readFile(itemToCompare_.getLabel() + "_" + fileList_.getSelectedItem().toString() + ".tsv");
-        }
+    protected void updateCombo() {
+        
         totalTimeSeries = visualizer_.getTotalTimeSeries();
         timeSeries.clear();
         

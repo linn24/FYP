@@ -32,6 +32,7 @@ public class TimeSeriesSelection extends TimeSeriesSelectionWindow {
     public TimeSeriesSelection(Frame aFrame, IElement item) {
         super(aFrame, item);
         visualizer_ = new TimeSeriesVisualizer(GnwGuiSettings.getInstance().getGnwGui().getFrame());
+        System.out.println("after creating a new visualizer:: total number of genes is " + visualizer_.getTotalGenes());
     
 
         //this.networkLabel = networkLabel;
@@ -98,7 +99,10 @@ public class TimeSeriesSelection extends TimeSeriesSelectionWindow {
             );
         genes.clear();
         genes.add("All genes");
-        visualizer_.getGenes(genes); 
+        visualizer_.getGenes(genes);
+        System.out.println("total number of genes is " + visualizer_.getTotalGenes());
+    
+        
         System.out.println("total genes: " + genes.size());
         
                 

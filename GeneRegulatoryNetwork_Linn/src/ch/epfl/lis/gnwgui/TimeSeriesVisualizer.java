@@ -22,7 +22,8 @@ import java.util.Vector;
 public class TimeSeriesVisualizer extends TimeSeriesVisualizerWindow {
     final int PAD = 80;
     static Vector<double[]> lstData = new Vector<double[]>();
-    static String[] genes;
+    //static
+    String[] genes;
     //static Vector<String> genes = new Vector<String>();
     TimeSeriesVisualizer graphWindow;
     MyTimeSeriesGraph graph;
@@ -32,6 +33,7 @@ public class TimeSeriesVisualizer extends TimeSeriesVisualizerWindow {
     static int tsIndex = 0;
     static int geneIndex = 0;
     static int[] geneIndices = {-1};
+    int counterForLoadingGenes = 0;
     
     public TimeSeriesVisualizer(Frame aFrame){
         super(aFrame);
@@ -52,7 +54,7 @@ public class TimeSeriesVisualizer extends TimeSeriesVisualizerWindow {
         return arr;
     }
     
-    public static void readFile(String fileName){
+    public void readFile(String fileName){
         try{
             
             // Open the file that is the first 
@@ -99,11 +101,16 @@ public class TimeSeriesVisualizer extends TimeSeriesVisualizerWindow {
                         */
                         if(genes == null || genes.length == 0){
                             genes = strLine.split("\t");
-                        }else{
+                        }else if(counterForLoadingGenes != 1){
                             System.out.println(genes.length + " genes found");
                             arrGenes = strLine.split("\t");
-                            for (int i = 0; i < arrGenes.length; i++){
-                                genes = append(genes, arrGenes[i]);
+                            
+                            // to check if both arrays are identical instead of checking length only
+                            if(arrGenes.length != genes.length){
+                                for (int i = 0; i < arrGenes.length; i++){
+                                    genes = append(genes, arrGenes[i]);
+                                }
+                                counterForLoadingGenes = 1;
                             }
                         }                        
                         System.out.println("total genes: " + genes.length);
@@ -134,7 +141,7 @@ public class TimeSeriesVisualizer extends TimeSeriesVisualizerWindow {
     
     
     
-    private static void fixVector(){
+    private void fixVector(){
         double[] arr = new double[lstTimeStamp.size()];
        
         int aIndex = 0;
@@ -154,7 +161,7 @@ public class TimeSeriesVisualizer extends TimeSeriesVisualizerWindow {
     }
     
     
-    private static double[] convertToDoubleArray(Object[] data){
+    private double[] convertToDoubleArray(Object[] data){
         double[] arr = new double[data.length];
         for (int i = 0; i < data.length; i++){
             arr[i] = Double.parseDouble(data[i].toString());
@@ -187,6 +194,13 @@ public class TimeSeriesVisualizer extends TimeSeriesVisualizerWindow {
             vGenes.add(genes[i]);
         }
         
+    }
+    
+    public int getTotalGenes(){
+        if (genes != null){
+            return genes.length;
+        }
+        return 0;
     }
     
     public int getTotalTimeSeries(){
