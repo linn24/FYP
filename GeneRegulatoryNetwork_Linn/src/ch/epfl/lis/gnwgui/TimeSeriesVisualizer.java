@@ -35,6 +35,7 @@ public class TimeSeriesVisualizer extends TimeSeriesVisualizerWindow {
     
     public TimeSeriesVisualizer(Frame aFrame){
         super(aFrame);
+        clearDataLists();
     }
     
     public void clearDataLists(){
@@ -96,9 +97,10 @@ public class TimeSeriesVisualizer extends TimeSeriesVisualizerWindow {
                             }
                         }
                         */
-                        if(genes.length == 0){
+                        if(genes == null || genes.length == 0){
                             genes = strLine.split("\t");
                         }else{
+                            System.out.println(genes.length + " genes found");
                             arrGenes = strLine.split("\t");
                             for (int i = 0; i < arrGenes.length; i++){
                                 genes = append(genes, arrGenes[i]);
