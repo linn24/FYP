@@ -34,10 +34,12 @@ public class TimeSeriesVisualizer extends TimeSeriesVisualizerWindow {
     static int geneIndex = 0;
     static int[] geneIndices = {-1};
     int counterForLoadingGenes = 0;
+    static int numOfTimeSeries;
     
     public TimeSeriesVisualizer(Frame aFrame){
         super(aFrame);
         clearDataLists();
+        numOfTimeSeries = 0;
     }
     
     public void clearDataLists(){
@@ -67,7 +69,7 @@ public class TimeSeriesVisualizer extends TimeSeriesVisualizerWindow {
             
             String[] arrTS;
             double[] arrDoubleTS;
-            int numOfTimeSeries = 0;
+            //int numOfTimeSeries = 0;
             String timeStamp = "";
             String[] arrGenes;
             
@@ -91,6 +93,11 @@ public class TimeSeriesVisualizer extends TimeSeriesVisualizerWindow {
                     //System.out.println("after:" + strLine);
 
                     if (numOfTimeSeries == 0){
+                        /* instead of checking with numOfTimeSeries 
+                         * to differentiate whether genes or timestamp coming in,
+                         * should use a boolean to identify the current info coming in
+                         */
+                        
                         /*
                         arrGenes = strLine.split("\t");
                         if(arrGenes.length != genes.size()){
@@ -204,7 +211,8 @@ public class TimeSeriesVisualizer extends TimeSeriesVisualizerWindow {
     }
     
     public int getTotalTimeSeries(){
-        return lstFixedData.size() / genes.length;
+        //return lstFixedData.size() / genes.length;
+        return numOfTimeSeries;
     }
     
     public int getTsIndex(){
@@ -369,8 +377,9 @@ public class TimeSeriesVisualizer extends TimeSeriesVisualizerWindow {
             gValue = 663;
             bValue = 526;
             aValue = 98;
-
-            int totalTimeSeries = lstFixedData.size() / genes.length;
+            
+            int totalTimeSeries = numOfTimeSeries;
+            //int totalTimeSeries = lstFixedData.size() / genes.length;
             System.out.println("total time series: " + totalTimeSeries);
 
             int index = -1;
