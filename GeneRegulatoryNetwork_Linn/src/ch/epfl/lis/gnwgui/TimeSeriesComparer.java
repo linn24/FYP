@@ -66,6 +66,7 @@ public class TimeSeriesComparer extends TimeSeriesComparerWindow {
                     public void actionPerformed(ActionEvent e) {
                         open();     
                         if (itemToCompare_ != null){
+                            selected_.setText(itemToCompare_.getLabel());
                             System.out.println("compare");
                             visualizer_.clearDataLists();
                             visualizer_.readFile(itemToCompare_.getLabel() + "_" + fileList_.getSelectedItem().toString() + ".tsv");

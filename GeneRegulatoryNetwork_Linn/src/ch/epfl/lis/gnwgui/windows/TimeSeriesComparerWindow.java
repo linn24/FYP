@@ -55,10 +55,10 @@ public class TimeSeriesComparerWindow extends TimeSeriesSelectionWindow
 	/** Serialization */
 	private static final long serialVersionUID = 1L;
 	
-	protected JPanel numOfWindowPanel_, versionPanel_, displayPanel_;
+	protected JPanel numOfWindowPanel_, versionPanel_, insideVersionPanel_, displayPanel_;
         
         protected JRadioButton oneWin_, twoWin_;
-        protected JLabel selectVersion_, selectDisplay_;
+        protected JLabel selectVersion_, selectDisplay_, selected_;
         protected JButton bOpen_;
 	
 	
@@ -84,6 +84,12 @@ public class TimeSeriesComparerWindow extends TimeSeriesSelectionWindow
                 versionPanel_.setBorder(BorderFactory.createEmptyBorder(20,20,20,20));                
                 getContentPane().add(versionPanel_);
 
+                insideVersionPanel_= new JPanel();
+		insideVersionPanel_.setBackground(Color.WHITE);
+		insideVersionPanel_.setLayout(new GridLayout(0,2));
+		insideVersionPanel_.setPreferredSize(new Dimension(0, 0));
+                insideVersionPanel_.setBorder(BorderFactory.createEmptyBorder(20,20,20,20));                
+                
                 numOfWindowPanel_ = new JPanel();
 		numOfWindowPanel_.setBackground(Color.WHITE);
 		numOfWindowPanel_.setLayout(new GridLayout(0,2));
@@ -130,9 +136,18 @@ public class TimeSeriesComparerWindow extends TimeSeriesSelectionWindow
                 bOpen_.setHorizontalAlignment(JButton.CENTER);
 		bOpen_.setPreferredSize(new Dimension(200, 80));
 		
+                selected_ = new JLabel("");
+                selected_.setFont(selectVersion_.getFont().deriveFont(Font.BOLD));
+                selected_.setHorizontalAlignment(JLabel.CENTER);
+                selected_.setBorder(BorderFactory.createEmptyBorder(20,20,20,20));
+                
+                insideVersionPanel_.add(bOpen_);
+                insideVersionPanel_.add(selected_);
                 
                 versionPanel_.add(selectVersion_);
-                versionPanel_.add(bOpen_);
+                versionPanel_.add(insideVersionPanel_);                
+                
+                
                 
                 getContentPane().add(versionPanel_);
                 getContentPane().add(displayPanel_);

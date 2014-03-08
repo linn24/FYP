@@ -16,30 +16,60 @@ import java.awt.geom.*;
 import javax.swing.*;
 import java.io.*;
 import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.Vector;
 
 
-public class TimeSeriesVisualizer extends TimeSeriesVisualizerWindow {
+public class TimeSeriesVisualizerComparison extends TimeSeriesVisualizerWindow {
     final int PAD = 80;
     static Vector<double[]> lstData = new Vector<double[]>();
-    //static
-    String[] genes;
-    //static Vector<String> genes = new Vector<String>();
-    TimeSeriesVisualizer graphWindow;
-    MyTimeSeriesGraph graph;
+    static Vector<double[]> lstCurrentData = new Vector<double[]>();
+    static Vector<double[]> lstCompareData = new Vector<double[]>();
+    
+    String[] genes, currentGenes, compareGenes;
+    
+    TimeSeriesVisualizerComparison graphWindow;
+    MyTimeSeriesGraph graph, currentGraph, compareGraph;
         
     static Vector<double[]> lstFixedData = new Vector<double[]>();
     static Vector<String> lstTimeStamp = new Vector<String>(); 
+    static Vector<double[]> lstFixedCurrentData = new Vector<double[]>();
+    static Vector<String> lstCurrentTimeStamp = new Vector<String>(); 
+    static Vector<double[]> lstFixedCompareData = new Vector<double[]>();
+    static Vector<String> lstCompareTimeStamp = new Vector<String>(); 
+    
     static int tsIndex = 0;
     static int geneIndex = 0;
     static int[] geneIndices = {-1};
     int counterForLoadingGenes = 0;
     //static int numOfTimeSeries;
     
-    public TimeSeriesVisualizer(Frame aFrame){
+    
+    // different options of graph base on number of windows: 0 = both in one window, 1 = first graph, 2 = second graph
+    private int graphOption = 0;
+    
+    private HashMap<String, String> currentGenesHash = new HashMap<String, String>(); 
+    private HashMap<String, String> compareGenesHash = new HashMap<String, String>(); 
+    
+    
+    public TimeSeriesVisualizerComparison(Frame aFrame){
         super(aFrame);
         clearDataLists();
         //numOfTimeSeries = 0;
+    }
+    
+    
+    // hash gene list so that different indices of same gene in both networks can be handled
+    public HashMap<String, String> hashGeneList(String[] genes){
+        HashMap<String, String> hash = new HashMap<String, String>();
+        for (int i = 0; i < genes.length; i++){
+            hash.put(genes[i], "" + i);
+        }
+        return hash;
     }
     
     public void clearDataLists(){
@@ -56,7 +86,9 @@ public class TimeSeriesVisualizer extends TimeSeriesVisualizerWindow {
         return arr;
     }
     
-    public void readFile(String fileName){
+    
+    public void readFile(String fileName, Vector<double[]> lstData, Vector<double[]> lstFixedData, Vector<String> lstTimeStamp, String[] genes){
+        
         try{
             
             // Open the file that is the first 
@@ -180,6 +212,7 @@ public class TimeSeriesVisualizer extends TimeSeriesVisualizerWindow {
     
     
     
+    
     private double getMax() {
         double max = -Double.MAX_VALUE;
         double[] data;
@@ -198,10 +231,21 @@ public class TimeSeriesVisualizer extends TimeSeriesVisualizerWindow {
         
     
     public void getGenes(Vector<String> vGenes){
-        for (int i = 0; i < genes.length; i++){
-            vGenes.add(genes[i]);
+        // find common genes from both networks
+        Set<String> genes;
+        String g;
+        genes = currentGenesHash.keySet();
+        Iterator i = genes.iterator();
+        while(i.hasNext()){
+            g = (String)i.next();
+            if (compareGenesHash.containsKey(g)){
+                vGenes.add(g);
+            }
         }
-        
+    }
+    
+    public int getCommonTimeSeries(){
+        return Math.min((lstFixedCurrentData.size() / currentGenes.length), (lstFixedCompareData.size() / compareGenes.length));
     }
     
     public int getTotalGenes(){
@@ -253,7 +297,7 @@ public class TimeSeriesVisualizer extends TimeSeriesVisualizerWindow {
     }
 
     public static void setLstFixedData(Vector<double[]> lstFixedData) {
-        TimeSeriesVisualizer.lstFixedData = lstFixedData;
+        TimeSeriesVisualizerComparison.lstFixedData = lstFixedData;
     }
 
     public static Vector<String> getLstTimeStamp() {
@@ -261,17 +305,17 @@ public class TimeSeriesVisualizer extends TimeSeriesVisualizerWindow {
     }
 
     public static void setLstTimeStamp(Vector<String> lstTimeStamp) {
-        TimeSeriesVisualizer.lstTimeStamp = lstTimeStamp;
+        TimeSeriesVisualizerComparison.lstTimeStamp = lstTimeStamp;
     }
 
     
     public void displayGraph(int tIndex, int gIndex){
         setTsIndex(tIndex);
         setGeneIndex(gIndex);
-        graph = new MyTimeSeriesGraph();        
+        currentGraph = new MyTimeSeriesGraph();        
         graphWindow = this;
         graphPanel_.removeAll();
-        graphPanel_.add(graph);
+        graphPanel_.add(currentGraph);
         graphPanel_.revalidate();
         graphPanel_.repaint();
     }
@@ -282,10 +326,10 @@ public class TimeSeriesVisualizer extends TimeSeriesVisualizerWindow {
         if (graphWindow != null){
             graphWindow.dispose();
         }
-        graph = new MyTimeSeriesGraph();        
+        currentGraph = new MyTimeSeriesGraph();        
         graphWindow = this;
         graphPanel_.removeAll();
-        graphPanel_.add(graph);
+        graphPanel_.add(currentGraph);
         graphPanel_.revalidate();
         graphPanel_.repaint();
     }
@@ -355,45 +399,7 @@ public class TimeSeriesVisualizer extends TimeSeriesVisualizerWindow {
             }
 
 
-            // Abcissa label.
-            /*
-            s = "x axis";
-            sy = h - PAD + (PAD - sh)/2 + lm.getAscent();
-            sw = (float)font.getStringBounds(s, frc).getWidth();
-            sx = (w - sw)/2;
-            g2.drawString(s, sx, sy);
-            */
-
-            xInc = (double)(w - 2*PAD)/(lstTimeStamp.size()-1);
-
-            for (int i = 0; i < lstTimeStamp.size(); i++){
-                s =  lstTimeStamp.get(i);
-                sy = h - PAD + (PAD - sh)/2;//+ lm.getAscent();
-                sw = (float)font.getStringBounds(s, frc).getWidth();
-                sx = (float) (PAD + i*xInc - (sw/2));
-                        //(float) (PAD + ((i + 1) * (sw/2))); //+ lm.getAscent();
-                g2.drawString(s, sx, sy);
-                g2.draw(new Line2D.Double(sx + (sw/2), h - PAD - 2, sx + (sw/2), h - PAD + 2));
-            }
-            s = "Time";
-            sy = h - PAD + (PAD - sh)/2 + 20;//+ lm.getAscent();
-            sw = (float)font.getStringBounds(s, frc).getWidth();
-            sx = (float) (PAD + (lstTimeStamp.size()*0.5*xInc) - (sw/2));
-            //AffineTransform orig = g2.getTransform();
-            //g2.rotate(-Math.PI/2);
-            g2.drawString(s, sx, sy);
-            //g2.drawString(s, 100, 300);
-
-            //g2.setTransform(orig);
-            /*
-            s = "Gene Expression";
-            sy = h - PAD + (PAD - sh)/2 + 20;//+ lm.getAscent();
-            sw = (float)font.getStringBounds(s, frc).getWidth();
-            sx = (float) (PAD + (lstTimeStamp.size()*0.5*xInc) - (sw/2));
-            g2.drawString(s, sx, sy);
-            */
-
-            double[] data;
+            double[] currentData, compareData;
             //final Random r = new Random();
             Color c;
             int rValue, gValue, bValue, aValue;
@@ -402,45 +408,193 @@ public class TimeSeriesVisualizer extends TimeSeriesVisualizerWindow {
             bValue = 526;
             aValue = 98;
             
-            //int totalTimeSeries = numOfTimeSeries;
-            int totalTimeSeries = lstFixedData.size() / genes.length;
-            System.out.println("total time series: " + totalTimeSeries);
+            int currentTotalTimeSeries = lstFixedCurrentData.size() / currentGenes.length;//getCommonTimeSeries(); //lstFixedData.size() / genes.length;
+            int compareTotalTimeSeries = lstFixedCompareData.size() / compareGenes.length;
+            System.out.println("total time series: " + currentTotalTimeSeries + " and " + compareTotalTimeSeries);
 
+
+            switch(graphOption){
+                case 0:
+                    xInc = (double)(w - 2*PAD)/(lstTimeStamp.size()-1);
+
+                    for (int i = 0; i < lstTimeStamp.size(); i++){
+                        s =  lstTimeStamp.get(i);
+                        sy = h - PAD + (PAD - sh)/2;//+ lm.getAscent();
+                        sw = (float)font.getStringBounds(s, frc).getWidth();
+                        sx = (float) (PAD + i*xInc - (sw/2));
+                                //(float) (PAD + ((i + 1) * (sw/2))); //+ lm.getAscent();
+                        g2.drawString(s, sx, sy);
+                        g2.draw(new Line2D.Double(sx + (sw/2), h - PAD - 2, sx + (sw/2), h - PAD + 2));
+                    }
+                    s = "Time";
+                    sy = h - PAD + (PAD - sh)/2 + 20;//+ lm.getAscent();
+                    sw = (float)font.getStringBounds(s, frc).getWidth();
+                    sx = (float) (PAD + (lstTimeStamp.size()*0.5*xInc) - (sw/2));
+                    g2.drawString(s, sx, sy);
+                    
+                    break;
+                case 1:
+                    xInc = (double)(w - 2*PAD)/(lstCurrentTimeStamp.size()-1);
+
+                    for (int i = 0; i < lstCurrentTimeStamp.size(); i++){
+                        s =  lstCurrentTimeStamp.get(i);
+                        sy = h - PAD + (PAD - sh)/2;//+ lm.getAscent();
+                        sw = (float)font.getStringBounds(s, frc).getWidth();
+                        sx = (float) (PAD + i*xInc - (sw/2));
+                                //(float) (PAD + ((i + 1) * (sw/2))); //+ lm.getAscent();
+                        g2.drawString(s, sx, sy);
+                        g2.draw(new Line2D.Double(sx + (sw/2), h - PAD - 2, sx + (sw/2), h - PAD + 2));
+                    }
+                    s = "Time";
+                    sy = h - PAD + (PAD - sh)/2 + 20;//+ lm.getAscent();
+                    sw = (float)font.getStringBounds(s, frc).getWidth();
+                    sx = (float) (PAD + (lstCurrentTimeStamp.size()*0.5*xInc) - (sw/2));
+                    g2.drawString(s, sx, sy);
+                    break;
+                case 2:
+                    xInc = (double)(w - 2*PAD)/(lstCompareTimeStamp.size()-1);
+
+                    for (int i = 0; i < lstCompareTimeStamp.size(); i++){
+                        s =  lstCompareTimeStamp.get(i);
+                        sy = h - PAD + (PAD - sh)/2;//+ lm.getAscent();
+                        sw = (float)font.getStringBounds(s, frc).getWidth();
+                        sx = (float) (PAD + i*xInc - (sw/2));
+                                //(float) (PAD + ((i + 1) * (sw/2))); //+ lm.getAscent();
+                        g2.drawString(s, sx, sy);
+                        g2.draw(new Line2D.Double(sx + (sw/2), h - PAD - 2, sx + (sw/2), h - PAD + 2));
+                    }
+                    s = "Time";
+                    sy = h - PAD + (PAD - sh)/2 + 20;//+ lm.getAscent();
+                    sw = (float)font.getStringBounds(s, frc).getWidth();
+                    sx = (float) (PAD + (lstCompareTimeStamp.size()*0.5*xInc) - (sw/2));
+                    g2.drawString(s, sx, sy);
+                    break;
+            }
+            
+                       
+
+           
+            
+            
             int index = -1;
             if (geneIndices.length > 0 && geneIndices[0] != -1 && geneIndices[0] != 0){
                 for (int iList = 0; iList < geneIndices.length; iList++){//lstFixedData.size()
                     index = geneIndices[iList] - 1;
-                    data = lstFixedData.get((totalTimeSeries * index) + tsIndex);
-                    // Draw lines.
-                    xInc = (double)(w - 2*PAD)/(data.length-1);
-
-                    //c = new Color(r.nextInt(256),r.nextInt(256),r.nextInt(256),r.nextInt(256));
+                    
+                    currentData = lstFixedCurrentData.get((currentTotalTimeSeries * index) + tsIndex);
+                    compareData = lstFixedCompareData.get((compareTotalTimeSeries * (Integer.parseInt(compareGenesHash.get(currentGenes[index])) - 1)) + tsIndex);
+                            
                     c = new Color((rValue * (index + 7)) % 256, (gValue * (index + 4)) % 256, 
                             (bValue * (index + 5)) % 256);//, (aValue * (index + 1)) % 200);
                     g2.setPaint(c);
 
-                    // write legend
-                    g2.draw(new Line2D.Double( w + 20 , PAD + (iList * ((h - PAD)  / genes.length)), w + 40, PAD + (iList * ((h - PAD) / genes.length))));
-                    g2.drawString(genes[index], w + 40, PAD + (iList * ((h - PAD) / genes.length)));
+                    switch(graphOption){
+                        case 0:
+                            int len = Math.min(currentData.length, compareData.length) -1;
+                            // Draw lines.
+                            xInc = (double)(w - 2*PAD)/ len;
 
-                    //g2.setPaint(Color.green.darker());
-                    for(int i = 0; i < data.length-1; i++) {
-                        double x1 = PAD + i*xInc;
-                        double y1 = h - PAD - scale*data[i];
-                        double x2 = PAD + (i+1)*xInc;
-                        double y2 = h - PAD - scale*data[i+1];
-                        g2.draw(new Line2D.Double(x1, y1, x2, y2));
-                    }
-                    // Mark data points.
-                    g2.setPaint(Color.red);
-                    for(int i = 0; i < data.length; i++) {
-                        double x = PAD + i*xInc;
-                        double y = h - PAD - scale*data[i];
-                        g2.fill(new Ellipse2D.Double(x-2, y-2, 4, 4));
 
+                            // write legend
+                            g2.draw(new Line2D.Double( w + 20 , PAD + (iList * ((h - PAD)  / (2 *geneIndices.length))), w + 40, PAD + (iList * ((h - PAD) / (2 *geneIndices.length)))));
+                            g2.drawString(currentGenes[index] + " (current)", w + 40, PAD + (iList * ((h - PAD) / (2 *geneIndices.length))));
+                            
+                            c = new Color((rValue * (index + 2)) % 256, (gValue * (index + 3)) % 256, 
+                                    (bValue * (index + 2)) % 256);//, (aValue * (index + 1)) % 200);
+                            g2.setPaint(c);
+                    
+                            g2.draw(new Line2D.Double( w + 20 , PAD + (iList * ((h - PAD)  / (2 *geneIndices.length))), w + 40, PAD + (iList * ((h - PAD) / (2 *geneIndices.length)))));
+                            g2.drawString(currentGenes[index], w + 40, PAD + (iList * ((h - PAD) / (2 *geneIndices.length))));
+
+                            //g2.setPaint(Color.green.darker());
+                            for(int i = 0; i < len; i++) {
+                                double x1 = PAD + i*xInc;
+                                double y1 = h - PAD - scale*currentData[i];
+                                double x2 = PAD + (i+1)*xInc;
+                                double y2 = h - PAD - scale*currentData[i+1];
+                                g2.draw(new Line2D.Double(x1, y1, x2, y2));
+                            }
+                            // Mark data points.
+                            g2.setPaint(Color.red);
+                            for(int i = 0; i < currentData.length; i++) {
+                                double x = PAD + i*xInc;
+                                double y = h - PAD - scale*currentData[i];
+                                g2.fill(new Ellipse2D.Double(x-2, y-2, 4, 4));
+
+                            }
+                            
+                            for(int i = 0; i < len; i++) {
+                                double x1 = PAD + i*xInc;
+                                double y1 = h - PAD - scale*compareData[i];
+                                double x2 = PAD + (i+1)*xInc;
+                                double y2 = h - PAD - scale*compareData[i+1];
+                                g2.draw(new Line2D.Double(x1, y1, x2, y2));
+                            }
+                            // Mark data points.
+                            g2.setPaint(Color.red);
+                            for(int i = 0; i < compareData.length; i++) {
+                                double x = PAD + i*xInc;
+                                double y = h - PAD - scale*compareData[i];
+                                g2.fill(new Ellipse2D.Double(x-2, y-2, 4, 4));
+
+                            }
+                            break;
+                        case 1:
+                            // Draw lines.
+                            xInc = (double)(w - 2*PAD)/(currentData.length-1);
+
+
+                            // write legend
+                            g2.draw(new Line2D.Double( w + 20 , PAD + (iList * ((h - PAD)  / geneIndices.length)), w + 40, PAD + (iList * ((h - PAD) / geneIndices.length))));
+                            g2.drawString(currentGenes[index], w + 40, PAD + (iList * ((h - PAD) / geneIndices.length)));
+
+                            //g2.setPaint(Color.green.darker());
+                            for(int i = 0; i < currentData.length-1; i++) {
+                                double x1 = PAD + i*xInc;
+                                double y1 = h - PAD - scale*currentData[i];
+                                double x2 = PAD + (i+1)*xInc;
+                                double y2 = h - PAD - scale*currentData[i+1];
+                                g2.draw(new Line2D.Double(x1, y1, x2, y2));
+                            }
+                            // Mark data points.
+                            g2.setPaint(Color.red);
+                            for(int i = 0; i < currentData.length; i++) {
+                                double x = PAD + i*xInc;
+                                double y = h - PAD - scale*currentData[i];
+                                g2.fill(new Ellipse2D.Double(x-2, y-2, 4, 4));
+
+                            }
+                            break;
+                        case 2:
+                            // Draw lines.
+                            xInc = (double)(w - 2*PAD)/(compareData.length-1);
+
+
+                            // write legend
+                            g2.draw(new Line2D.Double( w + 20 , PAD + (iList * ((h - PAD)  / geneIndices.length)), w + 40, PAD + (iList * ((h - PAD) / geneIndices.length))));
+                            g2.drawString(compareGenes[index], w + 40, PAD + (iList * ((h - PAD) / geneIndices.length)));
+
+                            //g2.setPaint(Color.green.darker());
+                            for(int i = 0; i < compareData.length-1; i++) {
+                                double x1 = PAD + i*xInc;
+                                double y1 = h - PAD - scale*compareData[i];
+                                double x2 = PAD + (i+1)*xInc;
+                                double y2 = h - PAD - scale*compareData[i+1];
+                                g2.draw(new Line2D.Double(x1, y1, x2, y2));
+                            }
+                            // Mark data points.
+                            g2.setPaint(Color.red);
+                            for(int i = 0; i < compareData.length; i++) {
+                                double x = PAD + i*xInc;
+                                double y = h - PAD - scale*compareData[i];
+                                g2.fill(new Ellipse2D.Double(x-2, y-2, 4, 4));
+
+                            }
+                            break;
                     }
                 }
             }else if (geneIndex == 0 || geneIndices[0] == 0){
+                /*
                 for (int iList = 0; iList < genes.length; iList++){//lstFixedData.size()
                     data = lstFixedData.get((totalTimeSeries * iList) + tsIndex);
                     // Draw lines.
@@ -472,35 +626,7 @@ public class TimeSeriesVisualizer extends TimeSeriesVisualizerWindow {
 
                     }
                 }
-            }else{
-
-                data = lstFixedData.get((totalTimeSeries * (geneIndex - 1)) + tsIndex);
-                // Draw lines.
-                xInc = (double)(w - 2*PAD)/(data.length-1);
-
-                g2.setPaint(Color.green.darker());
-
-                // write legend
-                g2.draw(new Line2D.Double( w + 20 , PAD + ((geneIndex - 1) * ((h - PAD)  / genes.length)), w + 40, PAD + ((geneIndex - 1) * ((h - PAD) / genes.length))));
-                g2.drawString(genes[(geneIndex - 1)], w + 40, PAD + ((geneIndex - 1) * ((h - PAD) / genes.length)));
-
-
-                for(int i = 0; i < data.length-1; i++) {
-                    double x1 = PAD + i*xInc;
-                    double y1 = h - PAD - scale*data[i];
-                    double x2 = PAD + (i+1)*xInc;
-                    double y2 = h - PAD - scale*data[i+1];
-                    g2.draw(new Line2D.Double(x1, y1, x2, y2));
-                }
-                // Mark data points.
-                g2.setPaint(Color.red);
-                for(int i = 0; i < data.length; i++) {
-                    double x = PAD + i*xInc;
-                    double y = h - PAD - scale*data[i];
-                    g2.fill(new Ellipse2D.Double(x-2, y-2, 4, 4));
-
-                }
-
+                */
             }
         }
 
