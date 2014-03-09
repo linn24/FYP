@@ -114,6 +114,7 @@ public class TimeSeriesComparerWindow extends TimeSeriesSelectionWindow
                 oneWin_.setSelected(true);
                 buttonGroup.add(oneWin_);
                 buttonGroup.add(twoWin_);
+                
                                 
                 selectDisplay_ = new JLabel("Select Display");
                 selectDisplay_.setFont(selectDisplay_.getFont().deriveFont(Font.BOLD));

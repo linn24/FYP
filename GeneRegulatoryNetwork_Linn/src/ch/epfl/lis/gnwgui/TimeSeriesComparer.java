@@ -39,6 +39,7 @@ import javax.swing.filechooser.FileFilter;
 
 public class TimeSeriesComparer extends TimeSeriesComparerWindow {
     TimeSeriesVisualizerComparison visualizer_ = null;
+    TimeSeriesVisualizerComparison secondVisualizer_ = null;
     Vector<String> genes = new Vector<String>();
     Vector<String> timeSeries = new Vector<String>();
     int totalTimeSeries;
@@ -53,7 +54,8 @@ public class TimeSeriesComparer extends TimeSeriesComparerWindow {
     public TimeSeriesComparer(Frame aFrame, IElement item) {
         super(aFrame, item);
         visualizer_ = new TimeSeriesVisualizerComparison(GnwGuiSettings.getInstance().getGnwGui().getFrame());
-    
+        secondVisualizer_ = new TimeSeriesVisualizerComparison(GnwGuiSettings.getInstance().getGnwGui().getFrame());
+                            
         itemToCompare_ = null;
         //this.networkLabel = networkLabel;
 
@@ -67,6 +69,39 @@ public class TimeSeriesComparer extends TimeSeriesComparerWindow {
         timeSeriesList_.setEnabled(false);
         oneWin_.setEnabled(false);
         twoWin_.setEnabled(false);
+        
+        oneWin_.addActionListener(
+                new ActionListener(){
+                    @Override
+                    public void actionPerformed(ActionEvent e){
+                        if(oneWin_.isSelected()){
+                            if(secondVisualizer_.graphWindow != null){
+                                secondVisualizer_.graphWindow.dispose();      
+                            }
+                            visualizer_.setGraphOption(0);
+                            updateGraph();
+                        }
+                    }
+                }
+                );
+        
+         twoWin_.addActionListener(
+                new ActionListener(){
+                    @Override
+                    public void actionPerformed(ActionEvent e){
+                        if(twoWin_.isSelected()){
+                            visualizer_.setGraphOption(1);
+                            updateGraph();
+                            
+                            secondVisualizer_.copyVisualizer(visualizer_);
+                            secondVisualizer_.setGraphOption(2);
+                            secondVisualizer_.displayGraph(timeSeriesList_.getSelectedIndex(), geneList_.getSelectedValues());
+                            secondVisualizer_.setHeaderInfo(itemToCompare_.getLabel());
+                            secondVisualizer_.setVisible(true);                            
+                        }
+                    }
+                }
+                );
         
         bOpen_.addActionListener(
                 new ActionListener(){
@@ -90,9 +125,9 @@ public class TimeSeriesComparer extends TimeSeriesComparerWindow {
                             visualizer_.setCompareGenesHash(visualizer_.hashGeneList(visualizer_.compareGenes));  
                             visualizer_.getCommonGenes();
                             updateCombo();
-                            updateGraph();
-                        }
-                        
+                            //updateGraph();
+                            checkWindow();
+                        }                       
         
                     }
                     
@@ -116,8 +151,8 @@ public class TimeSeriesComparer extends TimeSeriesComparerWindow {
                         visualizer_.setCurrentGenesHash(visualizer_.hashGeneList(visualizer_.currentGenes));
                         visualizer_.getCommonGenes();
                         updateCombo();
-                        updateGraph();
-
+                        //updateGraph();
+                        checkWindow();
                     }
                 }
             );
@@ -147,7 +182,27 @@ public class TimeSeriesComparer extends TimeSeriesComparerWindow {
         
     }
 
-    
+    protected void checkWindow(){
+        if(twoWin_.isSelected()){
+            visualizer_.setGraphOption(1);
+            updateGraph();
+
+            secondVisualizer_.copyVisualizer(visualizer_);
+            secondVisualizer_.setGraphOption(2);
+            secondVisualizer_.displayGraph(timeSeriesList_.getSelectedIndex(), geneList_.getSelectedValues());
+            secondVisualizer_.setHeaderInfo(itemToCompare_.getLabel());
+            secondVisualizer_.setVisible(true);
+
+            System.out.println("visaualizer_.graphOption: " + visualizer_.getGraphOption());
+            System.out.println("secondVisaualizer_.graphOption: " + secondVisualizer_.getGraphOption());
+        }else if(oneWin_.isSelected()){
+            if(secondVisualizer_.graphWindow != null){
+                secondVisualizer_.graphWindow.dispose();      
+            }
+            visualizer_.setGraphOption(0);
+            updateGraph();
+        }
+    }
     
     protected void updateCombo() {
         
@@ -165,9 +220,30 @@ public class TimeSeriesComparer extends TimeSeriesComparerWindow {
                         visualizer_.graphWindow.dispose();
                         JComboBox combo = (JComboBox)e.getSource();
                         int tsIndex = combo.getSelectedIndex();
-                        visualizer_.displayGraph(tsIndex, geneList_.getSelectedIndex());//0);
-                        visualizer_.setHeaderInfo(item_.getLabel());
-                        visualizer_.setVisible(true);
+                        
+                        if(twoWin_.isSelected()){
+                            visualizer_.setGraphOption(1);
+                            visualizer_.displayGraph(tsIndex, geneList_.getSelectedValues());//getSelectedIndex());//0);
+                            visualizer_.setHeaderInfo(item_.getLabel());
+                            visualizer_.setVisible(true);
+
+                            secondVisualizer_.copyVisualizer(visualizer_);
+                            secondVisualizer_.setGraphOption(2);
+                            secondVisualizer_.displayGraph(timeSeriesList_.getSelectedIndex(), geneList_.getSelectedValues());
+                            secondVisualizer_.setHeaderInfo(itemToCompare_.getLabel());
+                            secondVisualizer_.setVisible(true);
+
+                            System.out.println("visaualizer_.graphOption: " + visualizer_.getGraphOption());
+                            System.out.println("secondVisaualizer_.graphOption: " + secondVisualizer_.getGraphOption());
+                        }else if(oneWin_.isSelected()){
+                            if(secondVisualizer_.graphWindow != null){
+                                secondVisualizer_.graphWindow.dispose();      
+                            }
+                            visualizer_.setGraphOption(0);
+                            visualizer_.displayGraph(tsIndex, geneList_.getSelectedValues());//getSelectedIndex());//0);
+                            visualizer_.setHeaderInfo(item_.getLabel());
+                            visualizer_.setVisible(true);
+                        }
                     }
                 }    
             );
@@ -198,9 +274,29 @@ public class TimeSeriesComparer extends TimeSeriesComparerWindow {
                                 System.out.println( selectedValues[i] + " is selected.");
                             }
                             
-                            visualizer_.displayGraph(timeSeriesList_.getSelectedIndex(), selectedValues);
-                            visualizer_.setHeaderInfo(item_.getLabel());
-                            visualizer_.setVisible(true);
+                            if(twoWin_.isSelected()){
+                                visualizer_.setGraphOption(1);
+                                visualizer_.displayGraph(timeSeriesList_.getSelectedIndex(), selectedValues);//getSelectedIndex());//0);
+                                visualizer_.setHeaderInfo(item_.getLabel());
+                                visualizer_.setVisible(true);
+
+                                secondVisualizer_.copyVisualizer(visualizer_);
+                                secondVisualizer_.setGraphOption(2);
+                                secondVisualizer_.displayGraph(timeSeriesList_.getSelectedIndex(), selectedValues);
+                                secondVisualizer_.setHeaderInfo(itemToCompare_.getLabel());
+                                secondVisualizer_.setVisible(true);
+
+                                System.out.println("visaualizer_.graphOption: " + visualizer_.getGraphOption());
+                                System.out.println("secondVisaualizer_.graphOption: " + secondVisualizer_.getGraphOption());
+                            }else if(oneWin_.isSelected()){
+                                if(secondVisualizer_.graphWindow != null){
+                                    secondVisualizer_.graphWindow.dispose();      
+                                }
+                                visualizer_.setGraphOption(0);
+                                visualizer_.displayGraph(timeSeriesList_.getSelectedIndex(), selectedValues);//getSelectedIndex());//0);
+                                visualizer_.setHeaderInfo(item_.getLabel());
+                                visualizer_.setVisible(true);
+                            }
                         }
                         
                     }

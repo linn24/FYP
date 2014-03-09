@@ -42,9 +42,9 @@ public class TimeSeriesVisualizerComparison extends TimeSeriesVisualizerWindow {
     Vector<double[]> lstFixedCompareData = new Vector<double[]>();
     Vector<String> lstCompareTimeStamp = new Vector<String>(); 
     
-    static int tsIndex = 0;
-    static int geneIndex = 0;
-    static Object[] geneIndices = {""};
+    int tsIndex = 0;
+    int geneIndex = 0;
+    Object[] geneIndices = {""};
     int counterForLoadingGenes = 0;
     //static int numOfTimeSeries;
     
@@ -60,6 +60,23 @@ public class TimeSeriesVisualizerComparison extends TimeSeriesVisualizerWindow {
         super(aFrame);
         clearDataLists();
         //numOfTimeSeries = 0;
+    }
+    
+    public void copyVisualizer(TimeSeriesVisualizerComparison tsvc){
+        this.currentGenes = tsvc.currentGenes;
+        this.compareGenes = tsvc.compareGenes;
+        this.currentGenesHash = tsvc.currentGenesHash;
+        this.compareGenesHash = tsvc.compareGenesHash;
+        this.lstCurrentData = tsvc.lstCurrentData;
+        this.lstCompareData = tsvc.lstCompareData;
+        this.lstFixedCurrentData = tsvc.lstFixedCurrentData;
+        this.lstFixedCompareData = tsvc.lstFixedCompareData;
+        this.lstCurrentTimeStamp = tsvc.lstCurrentTimeStamp;
+        this.lstCompareTimeStamp = tsvc.lstCompareTimeStamp;
+        this.genes = tsvc.genes;
+        this.tsIndex = tsvc.tsIndex;
+        this.geneIndex = tsvc.geneIndex;
+        this.geneIndices = tsvc.geneIndices;
     }
     
     
@@ -78,6 +95,14 @@ public class TimeSeriesVisualizerComparison extends TimeSeriesVisualizerWindow {
 
     public void setCompareGenesHash(HashMap<String, String> compareGenesHash) {
         this.compareGenesHash = compareGenesHash;
+    }
+
+    public int getGraphOption() {
+        return graphOption;
+    }
+
+    public void setGraphOption(int graphOption) {
+        this.graphOption = graphOption;
     }
     
     
@@ -381,7 +406,9 @@ public class TimeSeriesVisualizerComparison extends TimeSeriesVisualizerWindow {
     
     public void displayGraph(int tIndex, Object[] gIndices){
         setTsIndex(tIndex);
-        setGeneIndices(gIndices);
+        if(gIndices.length > 0){
+            setGeneIndices(gIndices);
+        }
         if (graphWindow != null){
             graphWindow.dispose();
         }
@@ -611,7 +638,7 @@ public class TimeSeriesVisualizerComparison extends TimeSeriesVisualizerWindow {
 
                             // write legend
                             g2.draw(new Line2D.Double( w + 20 , PAD + (iList * ((h - PAD)  / getNumOfCommonGenes())), w + 40, PAD + (iList * ((h - PAD) / getNumOfCommonGenes()))));
-                            g2.drawString(currentGenes[index], w + 40, PAD + (iList * ((h - PAD) / getNumOfCommonGenes())));
+                            g2.drawString(currentGenes[index] + "*", w + 40, PAD + (iList * ((h - PAD) / getNumOfCommonGenes())));
 
                             //g2.setPaint(Color.green.darker());
                             for(int i = 0; i < currentData.length-1; i++) {
@@ -637,7 +664,7 @@ public class TimeSeriesVisualizerComparison extends TimeSeriesVisualizerWindow {
 
                             // write legend
                             g2.draw(new Line2D.Double( w + 20 , PAD + (iList * ((h - PAD)  / getNumOfCommonGenes())), w + 40, PAD + (iList * ((h - PAD) / getNumOfCommonGenes()))));
-                            g2.drawString(compareGenes[index], w + 40, PAD + (iList * ((h - PAD) / getNumOfCommonGenes())));
+                            g2.drawString(currentGenes[index], w + 40, PAD + (iList * ((h - PAD) / getNumOfCommonGenes())));
 
                             //g2.setPaint(Color.green.darker());
                             for(int i = 0; i < compareData.length-1; i++) {
@@ -668,97 +695,121 @@ public class TimeSeriesVisualizerComparison extends TimeSeriesVisualizerWindow {
                     c = new Color((rValue * (index + 7)) % 256, (gValue * (index + 4)) % 256, 
                             (bValue * (index + 5)) % 256);//, (aValue * (index + 1)) % 200);
                     g2.setPaint(c);
-                
-                    // Draw lines.
-                    xInc = (double)(w - 2*PAD)/ (currentData.length - 1);
+                    
+                    switch(graphOption){
+                        case 0:
+                            // Draw lines.
+                            xInc = (double)(w - 2*PAD)/ (currentData.length - 1);
 
 
-                    // write legend
-                    g2.draw(new Line2D.Double( w + 20 , PAD + ((iList * 2) * ((h - PAD)  / (2 * getNumOfCommonGenes()))), w + 40, PAD + ((iList * 2) * ((h - PAD) / (2 * getNumOfCommonGenes())))));
-                    g2.drawString(currentGenes[index] + "*", w + 40, PAD + ((iList * 2) * ((h - PAD) / (2 * getNumOfCommonGenes()))));
+                            // write legend
+                            g2.draw(new Line2D.Double( w + 20 , PAD + ((iList * 2) * ((h - PAD)  / (2 * getNumOfCommonGenes()))), w + 40, PAD + ((iList * 2) * ((h - PAD) / (2 * getNumOfCommonGenes())))));
+                            g2.drawString(currentGenes[index] + "*", w + 40, PAD + ((iList * 2) * ((h - PAD) / (2 * getNumOfCommonGenes()))));
 
-                    for(int i = 0; i < currentData.length - 1; i++) {
-                        double x1 = PAD + i*xInc;
-                        double y1 = h - PAD - scale*currentData[i];
-                        double x2 = PAD + (i+1)*xInc;
-                        double y2 = h - PAD - scale*currentData[i+1];
-                        g2.draw(new Line2D.Double(x1, y1, x2, y2));
+                            for(int i = 0; i < currentData.length - 1; i++) {
+                                double x1 = PAD + i*xInc;
+                                double y1 = h - PAD - scale*currentData[i];
+                                double x2 = PAD + (i+1)*xInc;
+                                double y2 = h - PAD - scale*currentData[i+1];
+                                g2.draw(new Line2D.Double(x1, y1, x2, y2));
+                            }
+                            // Mark data points.
+                            g2.setPaint(Color.red);
+                            for(int i = 0; i < currentData.length; i++) {
+                                double x = PAD + i*xInc;
+                                double y = h - PAD - scale*currentData[i];
+                                g2.fill(new Ellipse2D.Double(x-2, y-2, 4, 4));
+
+                            }
+
+
+                            c = new Color((rValue * (index + 2)) % 256, (gValue * (index + 3)) % 256, 
+                                    (bValue * (index + 2)) % 256);//, (aValue * (index + 1)) % 200);
+                            g2.setPaint(c);
+
+                            xInc = (double)(w - 2*PAD)/ (compareData.length -1);
+
+                            g2.draw(new Line2D.Double( w + 20 , PAD + (((iList * 2) + 1) * ((h - PAD)  / (2 * getNumOfCommonGenes()))), w + 40, PAD + (((iList * 2) + 1) * ((h - PAD) / (2 * getNumOfCommonGenes())))));
+                            g2.drawString(currentGenes[index], w + 40, PAD + (((iList * 2) + 1) * ((h - PAD) / (2 * getNumOfCommonGenes()))));
+
+                            //g2.setPaint(Color.green.darker());
+
+
+                            for(int i = 0; i < compareData.length - 1; i++) {
+                                double x1 = PAD + i*xInc;
+                                double y1 = h - PAD - scale*compareData[i];
+                                double x2 = PAD + (i+1)*xInc;
+                                double y2 = h - PAD - scale*compareData[i+1];
+                                g2.draw(new Line2D.Double(x1, y1, x2, y2));
+                            }
+                            // Mark data points.
+                            g2.setPaint(Color.red);
+                            for(int i = 0; i < compareData.length; i++) {
+                                double x = PAD + i*xInc;
+                                double y = h - PAD - scale*compareData[i];
+                                g2.fill(new Ellipse2D.Double(x-2, y-2, 4, 4));
+
+                            }
+                            break;
+                        case 1:
+                            // Draw lines.
+                            xInc = (double)(w - 2*PAD)/ (currentData.length - 1);
+
+
+                            // write legend
+                            g2.draw(new Line2D.Double( w + 20 , PAD + (iList * ((h - PAD)  / getNumOfCommonGenes())), w + 40, PAD + (iList * ((h - PAD) / getNumOfCommonGenes()))));
+                            g2.drawString(currentGenes[index] + "*", w + 40, PAD + (iList * ((h - PAD) / getNumOfCommonGenes())));
+
+                            for(int i = 0; i < currentData.length - 1; i++) {
+                                double x1 = PAD + i*xInc;
+                                double y1 = h - PAD - scale*currentData[i];
+                                double x2 = PAD + (i+1)*xInc;
+                                double y2 = h - PAD - scale*currentData[i+1];
+                                g2.draw(new Line2D.Double(x1, y1, x2, y2));
+                            }
+                            // Mark data points.
+                            g2.setPaint(Color.red);
+                            for(int i = 0; i < currentData.length; i++) {
+                                double x = PAD + i*xInc;
+                                double y = h - PAD - scale*currentData[i];
+                                g2.fill(new Ellipse2D.Double(x-2, y-2, 4, 4));
+
+                            }
+                            break;
+                        case 2:
+                            c = new Color((rValue * (index + 2)) % 256, (gValue * (index + 3)) % 256, 
+                                    (bValue * (index + 2)) % 256);//, (aValue * (index + 1)) % 200);
+                            g2.setPaint(c);
+
+                            xInc = (double)(w - 2*PAD)/ (compareData.length -1);
+
+                            g2.draw(new Line2D.Double( w + 20 , PAD + (iList * ((h - PAD)  / getNumOfCommonGenes())), w + 40, PAD + (iList * ((h - PAD) / getNumOfCommonGenes()))));
+                            g2.drawString(currentGenes[index], w + 40, PAD + (iList * ((h - PAD) / getNumOfCommonGenes())));
+
+                            //g2.setPaint(Color.green.darker());
+
+
+                            for(int i = 0; i < compareData.length - 1; i++) {
+                                double x1 = PAD + i*xInc;
+                                double y1 = h - PAD - scale*compareData[i];
+                                double x2 = PAD + (i+1)*xInc;
+                                double y2 = h - PAD - scale*compareData[i+1];
+                                g2.draw(new Line2D.Double(x1, y1, x2, y2));
+                            }
+                            // Mark data points.
+                            g2.setPaint(Color.red);
+                            for(int i = 0; i < compareData.length; i++) {
+                                double x = PAD + i*xInc;
+                                double y = h - PAD - scale*compareData[i];
+                                g2.fill(new Ellipse2D.Double(x-2, y-2, 4, 4));
+
+                            }
+                            break;
                     }
-                    // Mark data points.
-                    g2.setPaint(Color.red);
-                    for(int i = 0; i < currentData.length; i++) {
-                        double x = PAD + i*xInc;
-                        double y = h - PAD - scale*currentData[i];
-                        g2.fill(new Ellipse2D.Double(x-2, y-2, 4, 4));
-
-                    }
-
-
-                    c = new Color((rValue * (index + 2)) % 256, (gValue * (index + 3)) % 256, 
-                            (bValue * (index + 2)) % 256);//, (aValue * (index + 1)) % 200);
-                    g2.setPaint(c);
-
-                    xInc = (double)(w - 2*PAD)/ (compareData.length -1);
-
-                    g2.draw(new Line2D.Double( w + 20 , PAD + (((iList * 2) + 1) * ((h - PAD)  / (2 * getNumOfCommonGenes()))), w + 40, PAD + (((iList * 2) + 1) * ((h - PAD) / (2 * getNumOfCommonGenes())))));
-                    g2.drawString(currentGenes[index], w + 40, PAD + (((iList * 2) + 1) * ((h - PAD) / (2 * getNumOfCommonGenes()))));
-
-                    //g2.setPaint(Color.green.darker());
-
-
-                    for(int i = 0; i < compareData.length - 1; i++) {
-                        double x1 = PAD + i*xInc;
-                        double y1 = h - PAD - scale*compareData[i];
-                        double x2 = PAD + (i+1)*xInc;
-                        double y2 = h - PAD - scale*compareData[i+1];
-                        g2.draw(new Line2D.Double(x1, y1, x2, y2));
-                    }
-                    // Mark data points.
-                    g2.setPaint(Color.red);
-                    for(int i = 0; i < compareData.length; i++) {
-                        double x = PAD + i*xInc;
-                        double y = h - PAD - scale*compareData[i];
-                        g2.fill(new Ellipse2D.Double(x-2, y-2, 4, 4));
-
-                    }
-                }
-                
-                /*
-                for (int iList = 0; iList < genes.length; iList++){//lstFixedData.size()
-                    data = lstFixedData.get((totalTimeSeries * iList) + tsIndex);
-                    // Draw lines.
-                    xInc = (double)(w - 2*PAD)/(data.length-1);
-
-                    //c = new Color(r.nextInt(256),r.nextInt(256),r.nextInt(256),r.nextInt(256));
-                    c = new Color((rValue * (iList + 7)) % 256, (gValue * (iList + 4)) % 256, 
-                            (bValue * (iList + 5)) % 256);//, (aValue * (iList + 1)) % 200);
-                    g2.setPaint(c);
-
-                    // write legend
-                    g2.draw(new Line2D.Double( w + 20 , PAD + (iList * ((h - PAD)  / genes.length)), w + 40, PAD + (iList * ((h - PAD) / genes.length))));
-                    g2.drawString(genes[iList], w + 40, PAD + (iList * ((h - PAD) / genes.length)));
-
-                    //g2.setPaint(Color.green.darker());
-                    for(int i = 0; i < data.length-1; i++) {
-                        double x1 = PAD + i*xInc;
-                        double y1 = h - PAD - scale*data[i];
-                        double x2 = PAD + (i+1)*xInc;
-                        double y2 = h - PAD - scale*data[i+1];
-                        g2.draw(new Line2D.Double(x1, y1, x2, y2));
-                    }
-                    // Mark data points.
-                    g2.setPaint(Color.red);
-                    for(int i = 0; i < data.length; i++) {
-                        double x = PAD + i*xInc;
-                        double y = h - PAD - scale*data[i];
-                        g2.fill(new Ellipse2D.Double(x-2, y-2, 4, 4));
-
-                    }
-                }
-                */
+                }                                
             }
         }
-
+        
     }
 
 }
