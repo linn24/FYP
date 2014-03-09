@@ -38,11 +38,13 @@ import javax.swing.filechooser.FileFilter;
 
 
 public class TimeSeriesComparer extends TimeSeriesComparerWindow {
-    TimeSeriesVisualizer visualizer_ = null;
+    TimeSeriesVisualizerComparison visualizer_ = null;
     Vector<String> genes = new Vector<String>();
     Vector<String> timeSeries = new Vector<String>();
     int totalTimeSeries;
     protected static NetworkElement itemToCompare_ = null;
+    
+    String[] arrGenes = null;
     
     /** Logger for this class */
     private static Logger log_ = Logger.getLogger(IONetwork.class.getName());
@@ -50,7 +52,7 @@ public class TimeSeriesComparer extends TimeSeriesComparerWindow {
     
     public TimeSeriesComparer(Frame aFrame, IElement item) {
         super(aFrame, item);
-        visualizer_ = new TimeSeriesVisualizer(GnwGuiSettings.getInstance().getGnwGui().getFrame());
+        visualizer_ = new TimeSeriesVisualizerComparison(GnwGuiSettings.getInstance().getGnwGui().getFrame());
     
         itemToCompare_ = null;
         //this.networkLabel = networkLabel;
@@ -59,6 +61,13 @@ public class TimeSeriesComparer extends TimeSeriesComparerWindow {
         visualizer_.setHeaderInfo(getHeaderInfo());
         setHeaderInfo(getHeaderInfo());
         
+        // disable list selection until another network has been selected
+        geneList_.setEnabled(false);
+        fileList_.setEnabled(false);
+        timeSeriesList_.setEnabled(false);
+        oneWin_.setEnabled(false);
+        twoWin_.setEnabled(false);
+        
         bOpen_.addActionListener(
                 new ActionListener(){
 
@@ -66,12 +75,24 @@ public class TimeSeriesComparer extends TimeSeriesComparerWindow {
                     public void actionPerformed(ActionEvent e) {
                         open();     
                         if (itemToCompare_ != null){
+                            // enable list selection when another network has been selected
+                            geneList_.setEnabled(true);
+                            fileList_.setEnabled(true);
+                            timeSeriesList_.setEnabled(true);
+                            oneWin_.setEnabled(true);
+                            twoWin_.setEnabled(true);
+                            
                             selected_.setText(itemToCompare_.getLabel());
                             System.out.println("compare");
                             visualizer_.clearDataLists();
-                            visualizer_.readFile(itemToCompare_.getLabel() + "_" + fileList_.getSelectedItem().toString() + ".tsv");
+                            visualizer_.readFile(itemToCompare_.getLabel() + "_" + fileList_.getSelectedItem().toString() + ".tsv"
+                                    , visualizer_.lstCompareData, visualizer_.lstFixedCompareData, visualizer_.lstCompareTimeStamp, 2);
+                            visualizer_.setCompareGenesHash(visualizer_.hashGeneList(visualizer_.compareGenes));  
+                            visualizer_.getCommonGenes();
+                            updateCombo();
+                            updateGraph();
                         }
-                        updateCombo();
+                        
         
                     }
                     
@@ -86,10 +107,16 @@ public class TimeSeriesComparer extends TimeSeriesComparerWindow {
                         String fileName = (String)cb.getSelectedItem();
                         visualizer_.clearDataLists();        
                         if(itemToCompare_ != null){
-                            visualizer_.readFile(itemToCompare_.getLabel() + "_" + fileList_.getSelectedItem().toString() + ".tsv");
+                            visualizer_.readFile(itemToCompare_.getLabel() + "_" + fileList_.getSelectedItem().toString() + ".tsv"
+                                    , visualizer_.lstCompareData, visualizer_.lstFixedCompareData, visualizer_.lstCompareTimeStamp, 2);
+                        visualizer_.setCompareGenesHash(visualizer_.hashGeneList(visualizer_.compareGenes));            
                         }
-                        visualizer_.readFile(item_.getLabel() + "_" + fileName + ".tsv");
+                        visualizer_.readFile(item_.getLabel() + "_" + fileName + ".tsv"
+                                , visualizer_.lstCurrentData, visualizer_.lstFixedCurrentData, visualizer_.lstCurrentTimeStamp, 1);
+                        visualizer_.setCurrentGenesHash(visualizer_.hashGeneList(visualizer_.currentGenes));
+                        visualizer_.getCommonGenes();
                         updateCombo();
+                        updateGraph();
 
                     }
                 }
@@ -111,7 +138,11 @@ public class TimeSeriesComparer extends TimeSeriesComparerWindow {
         }
         
         visualizer_.clearDataLists();        
-        visualizer_.readFile(item_.getLabel() + "_" + fileList_.getSelectedItem().toString() + ".tsv");
+        visualizer_.readFile(item_.getLabel() + "_" + fileList_.getSelectedItem().toString() + ".tsv"
+                , visualizer_.lstCurrentData, visualizer_.lstFixedCurrentData, visualizer_.lstCurrentTimeStamp, 1);
+        System.out.println("lstFixedCurrentData.size(): " + visualizer_.lstFixedCurrentData.size());
+        System.out.println("currentGenes.length: " + visualizer_.currentGenes.length);
+        visualizer_.setCurrentGenesHash(visualizer_.hashGeneList(visualizer_.currentGenes));
         updateCombo();
         
     }
@@ -120,7 +151,7 @@ public class TimeSeriesComparer extends TimeSeriesComparerWindow {
     
     protected void updateCombo() {
         
-        totalTimeSeries = visualizer_.getTotalTimeSeries();
+        totalTimeSeries = visualizer_.getCommonTimeSeries();//getTotalTimeSeries();
         timeSeries.clear();
         
         for (int i = 0; i < totalTimeSeries; i++){
@@ -161,8 +192,8 @@ public class TimeSeriesComparer extends TimeSeriesComparerWindow {
                         if(!e.getValueIsAdjusting()){
                             JList list = (JList) e.getSource();
                             
-                            int[] selectedValues;
-                            selectedValues = list.getSelectedIndices();
+                            Object[] selectedValues;
+                            selectedValues = list.getSelectedValues();//list.getSelectedIndices();
                             for(int i = 0; i < selectedValues.length; i++){
                                 System.out.println( selectedValues[i] + " is selected.");
                             }
@@ -175,10 +206,12 @@ public class TimeSeriesComparer extends TimeSeriesComparerWindow {
                     }
                 }    
             );
-        
+    }
+    
+    public void updateGraph(){
         
         System.out.println("before");
-        visualizer_.displayGraph(0, new int[]{0});
+        visualizer_.displayGraph(0, new String[]{"All genes"});
         visualizer_.setHeaderInfo(item_.getLabel());
         visualizer_.setVisible(true);
         

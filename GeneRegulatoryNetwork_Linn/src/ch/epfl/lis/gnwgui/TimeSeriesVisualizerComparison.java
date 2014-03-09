@@ -26,25 +26,25 @@ import java.util.Vector;
 
 public class TimeSeriesVisualizerComparison extends TimeSeriesVisualizerWindow {
     final int PAD = 80;
-    static Vector<double[]> lstData = new Vector<double[]>();
-    static Vector<double[]> lstCurrentData = new Vector<double[]>();
-    static Vector<double[]> lstCompareData = new Vector<double[]>();
+    Vector<double[]> lstData = new Vector<double[]>();
+    Vector<double[]> lstCurrentData = new Vector<double[]>();
+    Vector<double[]> lstCompareData = new Vector<double[]>();
     
     String[] genes, currentGenes, compareGenes;
     
     TimeSeriesVisualizerComparison graphWindow;
     MyTimeSeriesGraph graph, currentGraph, compareGraph;
         
-    static Vector<double[]> lstFixedData = new Vector<double[]>();
-    static Vector<String> lstTimeStamp = new Vector<String>(); 
-    static Vector<double[]> lstFixedCurrentData = new Vector<double[]>();
-    static Vector<String> lstCurrentTimeStamp = new Vector<String>(); 
-    static Vector<double[]> lstFixedCompareData = new Vector<double[]>();
-    static Vector<String> lstCompareTimeStamp = new Vector<String>(); 
+    Vector<double[]> lstFixedData = new Vector<double[]>();
+    Vector<String> lstTimeStamp = new Vector<String>(); 
+    Vector<double[]> lstFixedCurrentData = new Vector<double[]>();
+    Vector<String> lstCurrentTimeStamp = new Vector<String>(); 
+    Vector<double[]> lstFixedCompareData = new Vector<double[]>();
+    Vector<String> lstCompareTimeStamp = new Vector<String>(); 
     
     static int tsIndex = 0;
     static int geneIndex = 0;
-    static int[] geneIndices = {-1};
+    static Object[] geneIndices = {""};
     int counterForLoadingGenes = 0;
     //static int numOfTimeSeries;
     
@@ -71,6 +71,16 @@ public class TimeSeriesVisualizerComparison extends TimeSeriesVisualizerWindow {
         }
         return hash;
     }
+
+    public void setCurrentGenesHash(HashMap<String, String> currentGenesHash) {
+        this.currentGenesHash = currentGenesHash;
+    }
+
+    public void setCompareGenesHash(HashMap<String, String> compareGenesHash) {
+        this.compareGenesHash = compareGenesHash;
+    }
+    
+    
     
     public void clearDataLists(){
         lstData = new Vector<double[]>();
@@ -79,15 +89,16 @@ public class TimeSeriesVisualizerComparison extends TimeSeriesVisualizerWindow {
     }
     
     
-    public static String[] append(String[] arr, String element) {
+    public String[] append(String[] arr, String element) {
         final int N = arr.length;
+                
         arr = Arrays.copyOf(arr, N + 1);
         arr[N] = element;
         return arr;
     }
     
     
-    public void readFile(String fileName, Vector<double[]> lstData, Vector<double[]> lstFixedData, Vector<String> lstTimeStamp, String[] genes){
+    public void readFile(String fileName, Vector<double[]> lstData, Vector<double[]> lstFixedData, Vector<String> lstTimeStamp, int option){
         
         try{
             
@@ -104,6 +115,7 @@ public class TimeSeriesVisualizerComparison extends TimeSeriesVisualizerWindow {
             int numOfTimeSeries = 0;
             String timeStamp = "";
             String[] arrGenes;
+            String[] genes = null;
             
             //Read File Line By Line
             while ((strLine = br.readLine()) != null)   {
@@ -171,6 +183,17 @@ public class TimeSeriesVisualizerComparison extends TimeSeriesVisualizerWindow {
             lstFixedData = fixVector(lstData, lstFixedData, lstTimeStamp, genes);
             System.out.println("total arrays in list: " + lstFixedData.size());
             
+            switch(option){
+                case 1:
+                    currentGenes = genes;
+                    break;
+                case 2:
+                    compareGenes = genes;
+                    break;
+            }
+            
+            System.out.println("currentGenes: " + currentGenes.length);
+            
             //Close the input stream
             in.close();
         }catch (Exception e){//Catch exception if any
@@ -213,7 +236,7 @@ public class TimeSeriesVisualizerComparison extends TimeSeriesVisualizerWindow {
     
     
     
-    private double getMax() {
+    private double getMax(Vector<double[]> lstData) {
         double max = -Double.MAX_VALUE;
         double[] data;
         
@@ -244,8 +267,44 @@ public class TimeSeriesVisualizerComparison extends TimeSeriesVisualizerWindow {
         }
     }
     
+    public int getNumOfCommonGenes(){
+        /*
+        int count = 0;
+        Set<String> genes;
+        String g;
+        genes = currentGenesHash.keySet();
+        Iterator i = genes.iterator();
+        while(i.hasNext()){
+            g = (String)i.next();
+            if (compareGenesHash.containsKey(g)){
+                count++;
+            }
+        }
+        return count;
+        */
+        return genes.length;
+    }
+    
+    public void getCommonGenes(){        
+        genes = new String[]{};
+        Set<String> geneSet;
+        String g;
+        geneSet = currentGenesHash.keySet();
+        Iterator i = geneSet.iterator();
+        while(i.hasNext()){
+            g = (String)i.next();
+            if (compareGenesHash.containsKey(g)){
+                genes =  append(genes, g);;
+            }
+        }
+    }
+    
     public int getCommonTimeSeries(){
-        return Math.min((lstFixedCurrentData.size() / currentGenes.length), (lstFixedCompareData.size() / compareGenes.length));
+        if (!lstFixedCurrentData.isEmpty() && !lstFixedCompareData.isEmpty()){
+            return Math.min((lstFixedCurrentData.size() / currentGenes.length), (lstFixedCompareData.size() / compareGenes.length));
+        }else{// if(lstFixedCurrentData != null){
+            return lstFixedCurrentData.size() / currentGenes.length;
+        }
     }
     
     public int getTotalGenes(){
@@ -276,11 +335,11 @@ public class TimeSeriesVisualizerComparison extends TimeSeriesVisualizerWindow {
         geneIndex = index;
     }
 
-    public int[] getGeneIndices() {
+    public Object[] getGeneIndices() {
         return geneIndices;
     }
 
-    public void setGeneIndices(int[] indices) {
+    public void setGeneIndices(Object[] indices) {
         geneIndices = indices;
     }
 
@@ -292,44 +351,44 @@ public class TimeSeriesVisualizerComparison extends TimeSeriesVisualizerWindow {
         this.genes = genes;
     }
 
-    public static Vector<double[]> getLstFixedData() {
+    public Vector<double[]> getLstFixedData() {
         return lstFixedData;
     }
 
-    public static void setLstFixedData(Vector<double[]> lstFixedData) {
-        TimeSeriesVisualizerComparison.lstFixedData = lstFixedData;
+    public void setLstFixedData(Vector<double[]> lstFixedData) {
+        this.lstFixedData = lstFixedData;
     }
 
-    public static Vector<String> getLstTimeStamp() {
+    public Vector<String> getLstTimeStamp() {
         return lstTimeStamp;
     }
 
-    public static void setLstTimeStamp(Vector<String> lstTimeStamp) {
-        TimeSeriesVisualizerComparison.lstTimeStamp = lstTimeStamp;
+    public void setLstTimeStamp(Vector<String> lstTimeStamp) {
+        this.lstTimeStamp = lstTimeStamp;
     }
 
     
     public void displayGraph(int tIndex, int gIndex){
         setTsIndex(tIndex);
         setGeneIndex(gIndex);
-        currentGraph = new MyTimeSeriesGraph();        
+        graph = new MyTimeSeriesGraph();        
         graphWindow = this;
         graphPanel_.removeAll();
-        graphPanel_.add(currentGraph);
+        graphPanel_.add(graph);
         graphPanel_.revalidate();
         graphPanel_.repaint();
     }
     
-    public void displayGraph(int tIndex, int[] gIndices){
+    public void displayGraph(int tIndex, Object[] gIndices){
         setTsIndex(tIndex);
         setGeneIndices(gIndices);
         if (graphWindow != null){
             graphWindow.dispose();
         }
-        currentGraph = new MyTimeSeriesGraph();        
+        graph = new MyTimeSeriesGraph();        
         graphWindow = this;
         graphPanel_.removeAll();
-        graphPanel_.add(currentGraph);
+        graphPanel_.add(graph);
         graphPanel_.revalidate();
         graphPanel_.repaint();
     }
@@ -374,12 +433,13 @@ public class TimeSeriesVisualizerComparison extends TimeSeriesVisualizerWindow {
 
             // Space between axis and label.
             final int SPAD = 2;
-            double scale = (double)(h - 2*PAD)/getMax();
+            double max = Math.max(getMax(lstCurrentData), getMax(lstCompareData));
+            double scale = (double)(h - 2*PAD)/max;
             float sw, sx;
             double label = 0;
             double xInc;
 
-            while(label < getMax()){
+            while(label < max){
                 //System.out.println("label:" + label);
                 s = String.valueOf(Math.round(label * 10.0) / 10.0);
                 sw = (float)font.getStringBounds(s, frc).getWidth();
@@ -415,10 +475,10 @@ public class TimeSeriesVisualizerComparison extends TimeSeriesVisualizerWindow {
 
             switch(graphOption){
                 case 0:
-                    xInc = (double)(w - 2*PAD)/(lstTimeStamp.size()-1);
+                    xInc = (double)(w - 2*PAD)/(lstCurrentTimeStamp.size()-1);
 
-                    for (int i = 0; i < lstTimeStamp.size(); i++){
-                        s =  lstTimeStamp.get(i);
+                    for (int i = 0; i < lstCurrentTimeStamp.size(); i++){
+                        s =  lstCurrentTimeStamp.get(i);
                         sy = h - PAD + (PAD - sh)/2;//+ lm.getAscent();
                         sw = (float)font.getStringBounds(s, frc).getWidth();
                         sx = (float) (PAD + i*xInc - (sw/2));
@@ -429,7 +489,7 @@ public class TimeSeriesVisualizerComparison extends TimeSeriesVisualizerWindow {
                     s = "Time";
                     sy = h - PAD + (PAD - sh)/2 + 20;//+ lm.getAscent();
                     sw = (float)font.getStringBounds(s, frc).getWidth();
-                    sx = (float) (PAD + (lstTimeStamp.size()*0.5*xInc) - (sw/2));
+                    sx = (float) (PAD + (lstCurrentTimeStamp.size()*0.5*xInc) - (sw/2));
                     g2.drawString(s, sx, sy);
                     
                     break;
@@ -477,12 +537,12 @@ public class TimeSeriesVisualizerComparison extends TimeSeriesVisualizerWindow {
             
             
             int index = -1;
-            if (geneIndices.length > 0 && geneIndices[0] != -1 && geneIndices[0] != 0){
+            if (geneIndices.length > 0 && geneIndices[0] != "" && geneIndices[0] != "All genes"){
                 for (int iList = 0; iList < geneIndices.length; iList++){//lstFixedData.size()
-                    index = geneIndices[iList] - 1;
+                    index = Integer.parseInt(currentGenesHash.get(geneIndices[iList].toString()));
                     
                     currentData = lstFixedCurrentData.get((currentTotalTimeSeries * index) + tsIndex);
-                    compareData = lstFixedCompareData.get((compareTotalTimeSeries * (Integer.parseInt(compareGenesHash.get(currentGenes[index])) - 1)) + tsIndex);
+                    compareData = lstFixedCompareData.get((compareTotalTimeSeries * (Integer.parseInt(compareGenesHash.get(geneIndices[iList].toString())))) + tsIndex);
                             
                     c = new Color((rValue * (index + 7)) % 256, (gValue * (index + 4)) % 256, 
                             (bValue * (index + 5)) % 256);//, (aValue * (index + 1)) % 200);
@@ -490,24 +550,16 @@ public class TimeSeriesVisualizerComparison extends TimeSeriesVisualizerWindow {
 
                     switch(graphOption){
                         case 0:
-                            int len = Math.min(currentData.length, compareData.length) -1;
+                            //int len = Math.min(currentData.length, compareData.length) -1;
                             // Draw lines.
-                            xInc = (double)(w - 2*PAD)/ len;
+                            xInc = (double)(w - 2*PAD)/ (currentData.length - 1);
 
 
                             // write legend
-                            g2.draw(new Line2D.Double( w + 20 , PAD + (iList * ((h - PAD)  / (2 *geneIndices.length))), w + 40, PAD + (iList * ((h - PAD) / (2 *geneIndices.length)))));
-                            g2.drawString(currentGenes[index] + " (current)", w + 40, PAD + (iList * ((h - PAD) / (2 *geneIndices.length))));
-                            
-                            c = new Color((rValue * (index + 2)) % 256, (gValue * (index + 3)) % 256, 
-                                    (bValue * (index + 2)) % 256);//, (aValue * (index + 1)) % 200);
-                            g2.setPaint(c);
-                    
-                            g2.draw(new Line2D.Double( w + 20 , PAD + (iList * ((h - PAD)  / (2 *geneIndices.length))), w + 40, PAD + (iList * ((h - PAD) / (2 *geneIndices.length)))));
-                            g2.drawString(currentGenes[index], w + 40, PAD + (iList * ((h - PAD) / (2 *geneIndices.length))));
-
-                            //g2.setPaint(Color.green.darker());
-                            for(int i = 0; i < len; i++) {
+                            g2.draw(new Line2D.Double( w + 20 , PAD + ((iList * 2) * ((h - PAD)  / (2 * getNumOfCommonGenes()))), w + 40, PAD + ((iList * 2) * ((h - PAD) / (2 * getNumOfCommonGenes())))));
+                            g2.drawString(currentGenes[index] + "*", w + 40, PAD + ((iList * 2) * ((h - PAD) / (2 * getNumOfCommonGenes()))));
+                           
+                            for(int i = 0; i < currentData.length - 1; i++) {
                                 double x1 = PAD + i*xInc;
                                 double y1 = h - PAD - scale*currentData[i];
                                 double x2 = PAD + (i+1)*xInc;
@@ -523,7 +575,20 @@ public class TimeSeriesVisualizerComparison extends TimeSeriesVisualizerWindow {
 
                             }
                             
-                            for(int i = 0; i < len; i++) {
+                            
+                            c = new Color((rValue * (index + 2)) % 256, (gValue * (index + 3)) % 256, 
+                                    (bValue * (index + 2)) % 256);//, (aValue * (index + 1)) % 200);
+                            g2.setPaint(c);
+                    
+                            xInc = (double)(w - 2*PAD)/ (compareData.length -1);
+                            
+                            g2.draw(new Line2D.Double( w + 20 , PAD + (((iList * 2) + 1) * ((h - PAD)  / (2 * getNumOfCommonGenes()))), w + 40, PAD + (((iList * 2) + 1) * ((h - PAD) / (2 * getNumOfCommonGenes())))));
+                            g2.drawString(currentGenes[index], w + 40, PAD + (((iList * 2) + 1) * ((h - PAD) / (2 * getNumOfCommonGenes()))));
+
+                            //g2.setPaint(Color.green.darker());
+                            
+                            
+                            for(int i = 0; i < compareData.length - 1; i++) {
                                 double x1 = PAD + i*xInc;
                                 double y1 = h - PAD - scale*compareData[i];
                                 double x2 = PAD + (i+1)*xInc;
@@ -545,8 +610,8 @@ public class TimeSeriesVisualizerComparison extends TimeSeriesVisualizerWindow {
 
 
                             // write legend
-                            g2.draw(new Line2D.Double( w + 20 , PAD + (iList * ((h - PAD)  / geneIndices.length)), w + 40, PAD + (iList * ((h - PAD) / geneIndices.length))));
-                            g2.drawString(currentGenes[index], w + 40, PAD + (iList * ((h - PAD) / geneIndices.length)));
+                            g2.draw(new Line2D.Double( w + 20 , PAD + (iList * ((h - PAD)  / getNumOfCommonGenes())), w + 40, PAD + (iList * ((h - PAD) / getNumOfCommonGenes()))));
+                            g2.drawString(currentGenes[index], w + 40, PAD + (iList * ((h - PAD) / getNumOfCommonGenes())));
 
                             //g2.setPaint(Color.green.darker());
                             for(int i = 0; i < currentData.length-1; i++) {
@@ -571,8 +636,8 @@ public class TimeSeriesVisualizerComparison extends TimeSeriesVisualizerWindow {
 
 
                             // write legend
-                            g2.draw(new Line2D.Double( w + 20 , PAD + (iList * ((h - PAD)  / geneIndices.length)), w + 40, PAD + (iList * ((h - PAD) / geneIndices.length))));
-                            g2.drawString(compareGenes[index], w + 40, PAD + (iList * ((h - PAD) / geneIndices.length)));
+                            g2.draw(new Line2D.Double( w + 20 , PAD + (iList * ((h - PAD)  / getNumOfCommonGenes())), w + 40, PAD + (iList * ((h - PAD) / getNumOfCommonGenes()))));
+                            g2.drawString(compareGenes[index], w + 40, PAD + (iList * ((h - PAD) / getNumOfCommonGenes())));
 
                             //g2.setPaint(Color.green.darker());
                             for(int i = 0; i < compareData.length-1; i++) {
@@ -593,7 +658,71 @@ public class TimeSeriesVisualizerComparison extends TimeSeriesVisualizerWindow {
                             break;
                     }
                 }
-            }else if (geneIndex == 0 || geneIndices[0] == 0){
+            }else if (geneIndex == 0 || geneIndices[0] == "All genes"){
+                for (int iList = 0; iList < genes.length; iList++){//lstFixedData.size()
+                    index = Integer.parseInt(currentGenesHash.get(genes[iList].toString()));
+                    
+                    currentData = lstFixedCurrentData.get((currentTotalTimeSeries * index) + tsIndex);
+                    compareData = lstFixedCompareData.get((compareTotalTimeSeries * (Integer.parseInt(compareGenesHash.get(genes[iList].toString())))) + tsIndex);
+                            
+                    c = new Color((rValue * (index + 7)) % 256, (gValue * (index + 4)) % 256, 
+                            (bValue * (index + 5)) % 256);//, (aValue * (index + 1)) % 200);
+                    g2.setPaint(c);
+                
+                    // Draw lines.
+                    xInc = (double)(w - 2*PAD)/ (currentData.length - 1);
+
+
+                    // write legend
+                    g2.draw(new Line2D.Double( w + 20 , PAD + ((iList * 2) * ((h - PAD)  / (2 * getNumOfCommonGenes()))), w + 40, PAD + ((iList * 2) * ((h - PAD) / (2 * getNumOfCommonGenes())))));
+                    g2.drawString(currentGenes[index] + "*", w + 40, PAD + ((iList * 2) * ((h - PAD) / (2 * getNumOfCommonGenes()))));
+
+                    for(int i = 0; i < currentData.length - 1; i++) {
+                        double x1 = PAD + i*xInc;
+                        double y1 = h - PAD - scale*currentData[i];
+                        double x2 = PAD + (i+1)*xInc;
+                        double y2 = h - PAD - scale*currentData[i+1];
+                        g2.draw(new Line2D.Double(x1, y1, x2, y2));
+                    }
+                    // Mark data points.
+                    g2.setPaint(Color.red);
+                    for(int i = 0; i < currentData.length; i++) {
+                        double x = PAD + i*xInc;
+                        double y = h - PAD - scale*currentData[i];
+                        g2.fill(new Ellipse2D.Double(x-2, y-2, 4, 4));
+
+                    }
+
+
+                    c = new Color((rValue * (index + 2)) % 256, (gValue * (index + 3)) % 256, 
+                            (bValue * (index + 2)) % 256);//, (aValue * (index + 1)) % 200);
+                    g2.setPaint(c);
+
+                    xInc = (double)(w - 2*PAD)/ (compareData.length -1);
+
+                    g2.draw(new Line2D.Double( w + 20 , PAD + (((iList * 2) + 1) * ((h - PAD)  / (2 * getNumOfCommonGenes()))), w + 40, PAD + (((iList * 2) + 1) * ((h - PAD) / (2 * getNumOfCommonGenes())))));
+                    g2.drawString(currentGenes[index], w + 40, PAD + (((iList * 2) + 1) * ((h - PAD) / (2 * getNumOfCommonGenes()))));
+
+                    //g2.setPaint(Color.green.darker());
+
+
+                    for(int i = 0; i < compareData.length - 1; i++) {
+                        double x1 = PAD + i*xInc;
+                        double y1 = h - PAD - scale*compareData[i];
+                        double x2 = PAD + (i+1)*xInc;
+                        double y2 = h - PAD - scale*compareData[i+1];
+                        g2.draw(new Line2D.Double(x1, y1, x2, y2));
+                    }
+                    // Mark data points.
+                    g2.setPaint(Color.red);
+                    for(int i = 0; i < compareData.length; i++) {
+                        double x = PAD + i*xInc;
+                        double y = h - PAD - scale*compareData[i];
+                        g2.fill(new Ellipse2D.Double(x-2, y-2, 4, 4));
+
+                    }
+                }
+                
                 /*
                 for (int iList = 0; iList < genes.length; iList++){//lstFixedData.size()
                     data = lstFixedData.get((totalTimeSeries * iList) + tsIndex);
