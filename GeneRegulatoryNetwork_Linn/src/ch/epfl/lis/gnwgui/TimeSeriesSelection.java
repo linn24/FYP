@@ -38,8 +38,8 @@ public class TimeSeriesSelection extends TimeSeriesSelectionWindow {
         //this.networkLabel = networkLabel;
 
         //visualizer_.displayGraph(networkLabel + "_" + options[optionList.getSelectedIndex()] + ".tsv");
-        visualizer_.setHeaderInfo(getHeaderInfo());
-        setHeaderInfo(getHeaderInfo());
+        visualizer_.setHeaderInfo(getHeaderInfo(item_));
+        setHeaderInfo(getHeaderInfo(item_));
         
         fileList_.addActionListener(
                 new ActionListener(){
@@ -92,7 +92,7 @@ public class TimeSeriesSelection extends TimeSeriesSelectionWindow {
                         JComboBox combo = (JComboBox)e.getSource();
                         int tsIndex = combo.getSelectedIndex();
                         visualizer_.displayGraph(tsIndex, geneList_.getSelectedIndex());//0);
-                        visualizer_.setHeaderInfo(item_.getLabel());
+                        visualizer_.setHeaderInfo(getHeaderInfo(item_));
                         visualizer_.setVisible(true);
                     }
                 }    
@@ -128,7 +128,7 @@ public class TimeSeriesSelection extends TimeSeriesSelectionWindow {
                             }
                             
                             visualizer_.displayGraph(timeSeriesList_.getSelectedIndex(), selectedValues);
-                            visualizer_.setHeaderInfo(item_.getLabel());
+                            visualizer_.setHeaderInfo(getHeaderInfo(item_));
                             visualizer_.setVisible(true);
                         }
                         
@@ -139,7 +139,7 @@ public class TimeSeriesSelection extends TimeSeriesSelectionWindow {
         
         System.out.println("before");
         visualizer_.displayGraph(0, new int[]{0});
-        visualizer_.setHeaderInfo(item_.getLabel());
+        visualizer_.setHeaderInfo(getHeaderInfo(item_));
         visualizer_.setVisible(true);
         
         System.out.println("after");
@@ -152,12 +152,12 @@ public class TimeSeriesSelection extends TimeSeriesSelectionWindow {
         
     }
     
-    private String getHeaderInfo(){
+    private String getHeaderInfo(IElement item){
         String title1, title2;
         title1 = title2 = "";
 
-        GeneNetwork geneNetwork = ((DynamicalModelElement)item_).getGeneNetwork();
-        title1 = item_.getLabel();
+        GeneNetwork geneNetwork = ((DynamicalModelElement)item).getGeneNetwork();
+        title1 = item.getLabel();
         title2 = geneNetwork.getSize() + " genes, " + geneNetwork.getNumEdges() + " interactions";
         
         return title1 + " (" + title2 + ")";

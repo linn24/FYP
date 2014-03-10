@@ -43,7 +43,7 @@ public class TimeSeriesComparer extends TimeSeriesComparerWindow {
     Vector<String> genes = new Vector<String>();
     Vector<String> timeSeries = new Vector<String>();
     int totalTimeSeries;
-    protected static NetworkElement itemToCompare_ = null;
+    protected static IElement itemToCompare_ = null;
     
     String[] arrGenes = null;
     
@@ -60,8 +60,8 @@ public class TimeSeriesComparer extends TimeSeriesComparerWindow {
         //this.networkLabel = networkLabel;
 
         //visualizer_.displayGraph(networkLabel + "_" + options[optionList.getSelectedIndex()] + ".tsv");
-        visualizer_.setHeaderInfo(getHeaderInfo());
-        setHeaderInfo(getHeaderInfo());
+        visualizer_.setHeaderInfo(getHeaderInfo(item_));
+        setHeaderInfo(getHeaderInfo(item_));
         
         // disable list selection until another network has been selected
         geneList_.setEnabled(false);
@@ -96,7 +96,7 @@ public class TimeSeriesComparer extends TimeSeriesComparerWindow {
                             secondVisualizer_.copyVisualizer(visualizer_);
                             secondVisualizer_.setGraphOption(2);
                             secondVisualizer_.displayGraph(timeSeriesList_.getSelectedIndex(), geneList_.getSelectedValues());
-                            secondVisualizer_.setHeaderInfo(itemToCompare_.getLabel());
+                            secondVisualizer_.setHeaderInfo(getHeaderInfo(itemToCompare_));
                             secondVisualizer_.setVisible(true);                            
                         }
                     }
@@ -190,7 +190,7 @@ public class TimeSeriesComparer extends TimeSeriesComparerWindow {
             secondVisualizer_.copyVisualizer(visualizer_);
             secondVisualizer_.setGraphOption(2);
             secondVisualizer_.displayGraph(timeSeriesList_.getSelectedIndex(), geneList_.getSelectedValues());
-            secondVisualizer_.setHeaderInfo(itemToCompare_.getLabel());
+            secondVisualizer_.setHeaderInfo(getHeaderInfo(itemToCompare_));
             secondVisualizer_.setVisible(true);
 
             System.out.println("visaualizer_.graphOption: " + visualizer_.getGraphOption());
@@ -224,13 +224,13 @@ public class TimeSeriesComparer extends TimeSeriesComparerWindow {
                         if(twoWin_.isSelected()){
                             visualizer_.setGraphOption(1);
                             visualizer_.displayGraph(tsIndex, geneList_.getSelectedValues());//getSelectedIndex());//0);
-                            visualizer_.setHeaderInfo(item_.getLabel());
+                            visualizer_.setHeaderInfo(getHeaderInfo(item_));
                             visualizer_.setVisible(true);
 
                             secondVisualizer_.copyVisualizer(visualizer_);
                             secondVisualizer_.setGraphOption(2);
                             secondVisualizer_.displayGraph(timeSeriesList_.getSelectedIndex(), geneList_.getSelectedValues());
-                            secondVisualizer_.setHeaderInfo(itemToCompare_.getLabel());
+                            secondVisualizer_.setHeaderInfo(getHeaderInfo(itemToCompare_));
                             secondVisualizer_.setVisible(true);
 
                             System.out.println("visaualizer_.graphOption: " + visualizer_.getGraphOption());
@@ -241,7 +241,7 @@ public class TimeSeriesComparer extends TimeSeriesComparerWindow {
                             }
                             visualizer_.setGraphOption(0);
                             visualizer_.displayGraph(tsIndex, geneList_.getSelectedValues());//getSelectedIndex());//0);
-                            visualizer_.setHeaderInfo(item_.getLabel());
+                            visualizer_.setHeaderInfo(getHeaderInfo(item_));
                             visualizer_.setVisible(true);
                         }
                     }
@@ -277,13 +277,13 @@ public class TimeSeriesComparer extends TimeSeriesComparerWindow {
                             if(twoWin_.isSelected()){
                                 visualizer_.setGraphOption(1);
                                 visualizer_.displayGraph(timeSeriesList_.getSelectedIndex(), selectedValues);//getSelectedIndex());//0);
-                                visualizer_.setHeaderInfo(item_.getLabel());
+                                visualizer_.setHeaderInfo(getHeaderInfo(item_));
                                 visualizer_.setVisible(true);
 
                                 secondVisualizer_.copyVisualizer(visualizer_);
                                 secondVisualizer_.setGraphOption(2);
                                 secondVisualizer_.displayGraph(timeSeriesList_.getSelectedIndex(), selectedValues);
-                                secondVisualizer_.setHeaderInfo(itemToCompare_.getLabel());
+                                secondVisualizer_.setHeaderInfo(getHeaderInfo(itemToCompare_));
                                 secondVisualizer_.setVisible(true);
 
                                 System.out.println("visaualizer_.graphOption: " + visualizer_.getGraphOption());
@@ -294,7 +294,7 @@ public class TimeSeriesComparer extends TimeSeriesComparerWindow {
                                 }
                                 visualizer_.setGraphOption(0);
                                 visualizer_.displayGraph(timeSeriesList_.getSelectedIndex(), selectedValues);//getSelectedIndex());//0);
-                                visualizer_.setHeaderInfo(item_.getLabel());
+                                visualizer_.setHeaderInfo(getHeaderInfo(item_));
                                 visualizer_.setVisible(true);
                             }
                         }
@@ -308,7 +308,7 @@ public class TimeSeriesComparer extends TimeSeriesComparerWindow {
         
         System.out.println("before");
         visualizer_.displayGraph(0, new String[]{"All genes"});
-        visualizer_.setHeaderInfo(item_.getLabel());
+        visualizer_.setHeaderInfo(getHeaderInfo(item_));
         visualizer_.setVisible(true);
         
         System.out.println("after");
@@ -321,12 +321,12 @@ public class TimeSeriesComparer extends TimeSeriesComparerWindow {
         
     }
     
-    private String getHeaderInfo(){
+    private String getHeaderInfo(IElement item){
         String title1, title2;
         title1 = title2 = "";
-
-        GeneNetwork geneNetwork = ((DynamicalModelElement)item_).getGeneNetwork();
-        title1 = item_.getLabel();
+        
+        GeneNetwork geneNetwork = ((DynamicalModelElement)item).getGeneNetwork();
+        title1 = item.getLabel();
         title2 = geneNetwork.getSize() + " genes, " + geneNetwork.getNumEdges() + " interactions";
         
         return title1 + " (" + title2 + ")";
@@ -373,7 +373,7 @@ public class TimeSeriesComparer extends TimeSeriesComparerWindow {
                             URL url = GnwSettings.getInstance().getURL(absPath);
 
                             if (f == null || f instanceof FilterNetworkSBML){
-                                    itemToCompare_ = new NetworkElement(loadItem(filename, url, GeneNetwork.SBML));
+                                    itemToCompare_ = new DynamicalModelElement(loadItem(filename, url, GeneNetwork.SBML));
                             }else{
                                     throw new Exception("Selected format unhandled!");
                             }
@@ -402,7 +402,7 @@ public class TimeSeriesComparer extends TimeSeriesComparerWindow {
             
     }
 
-    public static NetworkElement loadItem(String name, URL absPath, Integer format) throws 	FileNotFoundException, ParseException, Exception
+    public static DynamicalModelElement loadItem(String name, URL absPath, Integer format) throws 	FileNotFoundException, ParseException, Exception
     {
             if (name.equals("") || name.charAt(0) == '#')
                     name = FilenameUtilities.getFilenameWithoutPath(absPath.getPath());

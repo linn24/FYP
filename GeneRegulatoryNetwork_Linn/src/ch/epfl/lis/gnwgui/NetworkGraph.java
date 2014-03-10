@@ -465,86 +465,102 @@ public class NetworkGraph {
 			   //item_.getNetworkViewer().getControl().printGraph();
                        
                     Set<Node> picked_nodes = pickedState_.getPicked();
-                    Set<Edge> picked_edges = pickedEdges_.getPicked();
-                    
-                    JOptionPane.showMessageDialog(null, 
-                         picked_nodes.size() + " nodes and " + picked_edges.size() + " edges are picked", 
-                         "Delete Nodes and Edges", JOptionPane.INFORMATION_MESSAGE);
-
-
+                    String msg = "";
+                    //Set<Edge> picked_edges = pickedEdges_.getPicked();
                     
                     // confirm to delete all picked nodes
+                    ImageIcon icon = new ImageIcon(GnwGuiSettings.getInstance().getStructureIcon());
 
-                    // copy the current network into a temporary network
-                    if (noChanges){
-                        tempStructure_ = structure_.copy();
-                        noChanges = false;
-                    }
-                    /*
-                    if (tempGraph_.item_ instanceof StructureElement) {
-                        tempGraph_.structure_ = ((StructureElement)tempGraph_.item_).getNetwork();
-                    } else if (tempGraph_.item_ instanceof DynamicalModelElement) {
-                        tempGraph_.structure_ = ((DynamicalModelElement)tempGraph_.item_).getGeneNetwork();
-                    }
-                    */
-                    System.out.println("total number of nodes in original network is " + tempStructure_.getSize());
-                    System.out.println("total number of edges in original network is " + tempStructure_.getNumEdges());
+                    int n = JOptionPane.showConfirmDialog(
+                                    new JFrame(),
+                                    picked_nodes.size() + " gene(s) is/are picked." +
+                                    "\nAre you sure that you want to delete the selected gene(s)?", 
+                                    "Delete Genes",
+                                    JOptionPane.YES_NO_OPTION,
+                                    JOptionPane.QUESTION_MESSAGE,
+                                    icon);
+
                     
-                    // delete the picked edges first
-                    /*
-                    ArrayList<Edge> edges = new ArrayList<Edge>();
-                    for (Iterator<Edge> edgeIt = picked_edges.iterator(); edgeIt.hasNext(); ) {
-                        Edge edgeToDelete = edgeIt.next();
-                        System.out.println(edgeToDelete.getSource() + " to "+ edgeToDelete.getTarget());
-                        System.out.println("before: " + tempGraph_.structure_.getNumEdges());
-                        edges = tempGraph_.structure_.getEdges();
-                        
-                        if(edges.remove(edgeToDelete)){
-                            tempGraph_.structure_.setEdges(edges);
+                    if (n == JOptionPane.YES_OPTION){
+
+                        // copy the current network into a temporary network
+                        if (noChanges){
+                            tempStructure_ = structure_.copy();
+                            noChanges = false;
                         }
-                        System.out.println("after: " + tempGraph_.structure_.getNumEdges());                        
-                    }
-                    */
-                    
-                    
-                    // delete the picked nodes
-                    for (Iterator<Node> nodeIt = picked_nodes.iterator(); nodeIt.hasNext(); ) {
-                        Node nodeToDelete = nodeIt.next();
-                        System.out.println(nodeToDelete.getLabel());
-                        System.out.println("before: " + structure_.getSize());
-                        structure_.removeNode(nodeToDelete);
-                        System.out.println("after: " + structure_.getSize());                        
-                    }
-                    
-                    
-                    // update item_
-                    if (item_ instanceof StructureElement) {
-                        ((StructureElement)item_).setNetwork(new ImodNetwork(structure_));
-                        //structure_ = (.getNetwork();
-                    } else if (item_ instanceof DynamicalModelElement) {
-                        ((DynamicalModelElement)item_).setGeneNetwork(new GeneNetwork(structure_));
-                    }
+                        /*
+                        if (tempGraph_.item_ instanceof StructureElement) {
+                            tempGraph_.structure_ = ((StructureElement)tempGraph_.item_).getNetwork();
+                        } else if (tempGraph_.item_ instanceof DynamicalModelElement) {
+                            tempGraph_.structure_ = ((DynamicalModelElement)tempGraph_.item_).getGeneNetwork();
+                        }
+                        */
+                        System.out.println("total number of nodes in original network is " + tempStructure_.getSize());
+                        System.out.println("total number of edges in original network is " + tempStructure_.getNumEdges());
 
-                    // close current window
-                    // ----
-                    /*
-                    tempGraph.netSize_ = tempGraph.structure_.getSize();
-                    tempGraph.control_ = new MyGraphViewerController();
-                    tempGraph.screen_ = new JPanel();
-                    tempGraph.screen_.setLayout(new BorderLayout());
-                    tempGraph.computeGraph();
-                    */
-                    
-                    netSize_ = structure_.getSize();
-                    computeGraph();
-                    control_.resetControlSetting();
-            
-                    //initialize();
-                    
-                    //Options.viewNetwork(tempGraph.item_);
-                    
-                    
-		   }
+                        // delete the picked edges first
+                        /*
+                        ArrayList<Edge> edges = new ArrayList<Edge>();
+                        for (Iterator<Edge> edgeIt = picked_edges.iterator(); edgeIt.hasNext(); ) {
+                            Edge edgeToDelete = edgeIt.next();
+                            System.out.println(edgeToDelete.getSource() + " to "+ edgeToDelete.getTarget());
+                            System.out.println("before: " + tempGraph_.structure_.getNumEdges());
+                            edges = tempGraph_.structure_.getEdges();
+
+                            if(edges.remove(edgeToDelete)){
+                                tempGraph_.structure_.setEdges(edges);
+                            }
+                            System.out.println("after: " + tempGraph_.structure_.getNumEdges());                        
+                        }
+                        */
+                        
+                        msg = "[";
+
+                        // delete the picked nodes
+                        for (Iterator<Node> nodeIt = picked_nodes.iterator(); nodeIt.hasNext(); ) {
+                            Node nodeToDelete = nodeIt.next();
+                            msg += nodeToDelete.getLabel() + ", ";
+                            System.out.println(nodeToDelete.getLabel());
+                            System.out.println("before: " + structure_.getSize());
+                            structure_.removeNode(nodeToDelete);
+                            System.out.println("after: " + structure_.getSize());                        
+                        }
+                        
+                        msg = msg.substring(0, msg.length() - 2);
+                        msg += "] has/have been deleted successfully.";
+
+                        // update item_
+                        if (item_ instanceof StructureElement) {
+                            ((StructureElement)item_).setNetwork(new ImodNetwork(structure_));
+                            //structure_ = (.getNetwork();
+                        } else if (item_ instanceof DynamicalModelElement) {
+                            ((DynamicalModelElement)item_).setGeneNetwork(new GeneNetwork(structure_));
+                        }
+
+                        // close current window
+                        // ----
+                        /*
+                        tempGraph.netSize_ = tempGraph.structure_.getSize();
+                        tempGraph.control_ = new MyGraphViewerController();
+                        tempGraph.screen_ = new JPanel();
+                        tempGraph.screen_.setLayout(new BorderLayout());
+                        tempGraph.computeGraph();
+                        */
+
+                        netSize_ = structure_.getSize();
+                        computeGraph();
+                        control_.resetControlSetting();
+
+                        //initialize();
+
+                        //Options.viewNetwork(tempGraph.item_);
+                        
+                        JOptionPane.showMessageDialog(null, 
+                                msg,
+                                "Genes Deleted", JOptionPane.INFORMATION_MESSAGE);
+
+                    }
+                }
 	   });
 	}
         
@@ -555,51 +571,47 @@ public class NetworkGraph {
 	   jp.getActionMap().put("savechanges", new AbstractAction() {
                     public void actionPerformed(ActionEvent arg0) {
                         
-                        System.out.println("inside save");
+                        // check if any changes have been made
+                        if (tempStructure_ == null){
+                            JOptionPane.showMessageDialog(null, 
+                                "No changes have been made yet.",
+                                "No Changes Yet", JOptionPane.INFORMATION_MESSAGE);
+                        }else{                        
                         
-                        ImageIcon icon = new ImageIcon(GnwGuiSettings.getInstance().getStructureIcon());
+                            ImageIcon icon = new ImageIcon(GnwGuiSettings.getInstance().getStructureIcon());
 
-                        int n = JOptionPane.showConfirmDialog(
-                                        new JFrame(),
-                                        "After saving changes, the visualization will be refreshed and the original network will be displayed.\n"
-                                        + "To open the new version with changes, please click \"OPEN\".\n"
-                                        + "Are you sure that you want to proceed?",
-                                        "GNW message",
-                                        JOptionPane.YES_NO_OPTION,
-                                        JOptionPane.QUESTION_MESSAGE,
-                                        icon);
+                            int n = JOptionPane.showConfirmDialog(
+                                            new JFrame(),
+                                            "After saving changes, the visualization will be refreshed and the original network will be displayed.\n"
+                                            + "To open the new version with changes, please click \"OPEN\".\n"
+                                            + "Are you sure that you want to proceed?",
+                                            "GNW message",
+                                            JOptionPane.YES_NO_OPTION,
+                                            JOptionPane.QUESTION_MESSAGE,
+                                            icon);
 
-                        if (n == JOptionPane.YES_OPTION){
-                            // If the user selected YES
-                            /*
-                            IONetwork.saveAs((NetworkElement) item_);
-                            GnwGuiSettings.getInstance().getNetworkDesktop().removeItemFromDesktop(item_);
-                            log_.log(Level.INFO, "The network " + item_.getLabel() + " and all its children have been deleted!");
-                            JDialog topFrame = (JDialog) SwingUtilities.getWindowAncestor(screen_);
-                            topFrame.dispose();
-                            */
-                        
-                            // export the network with changes
+                            if (n == JOptionPane.YES_OPTION){
+                                // If the user selected YES
+                                // export the network with changes
+                                IONetwork.saveAs((NetworkElement) item_);
+                                System.out.println("size of modified network is " + structure_.getSize());
 
-                            IONetwork.saveAs((NetworkElement) item_);
-                            System.out.println("size of modified network is " + structure_.getSize());
+                                // update item_
+                                structure_ = tempStructure_.copy();
+                                System.out.println("size of original network is " + structure_.getSize());
 
-                            // update item_
-                            structure_ = tempStructure_.copy();
-                            System.out.println("size of original network is " + structure_.getSize());
+                                if (item_ instanceof StructureElement) {
+                                    ((StructureElement)item_).setNetwork(new ImodNetwork(structure_));
+                                } else if (item_ instanceof DynamicalModelElement) {
+                                    ((DynamicalModelElement)item_).setGeneNetwork(new GeneNetwork(structure_));
+                                }
 
-                            if (item_ instanceof StructureElement) {
-                                ((StructureElement)item_).setNetwork(new ImodNetwork(structure_));
-                            } else if (item_ instanceof DynamicalModelElement) {
-                                ((DynamicalModelElement)item_).setGeneNetwork(new GeneNetwork(structure_));
+                                netSize_ = structure_.getSize();
+                                computeGraph();
+                                control_.resetControlSetting();
                             }
-
-                            netSize_ = structure_.getSize();
-                            computeGraph();
-                            control_.resetControlSetting();
-                        }
                         
-
+                        }
 		   }
 	   });
 	}
