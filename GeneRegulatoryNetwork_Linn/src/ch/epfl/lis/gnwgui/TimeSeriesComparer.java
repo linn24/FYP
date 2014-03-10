@@ -79,6 +79,7 @@ public class TimeSeriesComparer extends TimeSeriesComparerWindow {
                                 secondVisualizer_.graphWindow.dispose();      
                             }
                             visualizer_.setGraphOption(0);
+                            visualizer_.setHeaderInfo(getHeaderInfo(item_) + " Vs. " + getHeaderInfo(itemToCompare_));
                             updateGraph();
                         }
                     }
@@ -91,6 +92,7 @@ public class TimeSeriesComparer extends TimeSeriesComparerWindow {
                     public void actionPerformed(ActionEvent e){
                         if(twoWin_.isSelected()){
                             visualizer_.setGraphOption(1);
+                            visualizer_.setHeaderInfo(getHeaderInfo(item_));
                             updateGraph();
                             
                             secondVisualizer_.copyVisualizer(visualizer_);
@@ -185,6 +187,7 @@ public class TimeSeriesComparer extends TimeSeriesComparerWindow {
     protected void checkWindow(){
         if(twoWin_.isSelected()){
             visualizer_.setGraphOption(1);
+            visualizer_.setHeaderInfo(getHeaderInfo(item_));
             updateGraph();
 
             secondVisualizer_.copyVisualizer(visualizer_);
@@ -200,6 +203,7 @@ public class TimeSeriesComparer extends TimeSeriesComparerWindow {
                 secondVisualizer_.graphWindow.dispose();      
             }
             visualizer_.setGraphOption(0);
+            visualizer_.setHeaderInfo(getHeaderInfo(item_) + " Vs. " + getHeaderInfo(itemToCompare_));
             updateGraph();
         }
     }
@@ -241,7 +245,7 @@ public class TimeSeriesComparer extends TimeSeriesComparerWindow {
                             }
                             visualizer_.setGraphOption(0);
                             visualizer_.displayGraph(tsIndex, geneList_.getSelectedValues());//getSelectedIndex());//0);
-                            visualizer_.setHeaderInfo(getHeaderInfo(item_));
+                            visualizer_.setHeaderInfo(getHeaderInfo(item_) + " Vs. " + getHeaderInfo(itemToCompare_));
                             visualizer_.setVisible(true);
                         }
                     }
@@ -294,7 +298,7 @@ public class TimeSeriesComparer extends TimeSeriesComparerWindow {
                                 }
                                 visualizer_.setGraphOption(0);
                                 visualizer_.displayGraph(timeSeriesList_.getSelectedIndex(), selectedValues);//getSelectedIndex());//0);
-                                visualizer_.setHeaderInfo(getHeaderInfo(item_));
+                                visualizer_.setHeaderInfo(getHeaderInfo(item_) + " Vs. " + getHeaderInfo(itemToCompare_));
                                 visualizer_.setVisible(true);
                             }
                         }
@@ -308,7 +312,7 @@ public class TimeSeriesComparer extends TimeSeriesComparerWindow {
         
         System.out.println("before");
         visualizer_.displayGraph(0, new String[]{"All genes"});
-        visualizer_.setHeaderInfo(getHeaderInfo(item_));
+        //visualizer_.setHeaderInfo(getHeaderInfo(item_));
         visualizer_.setVisible(true);
         
         System.out.println("after");
