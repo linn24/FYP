@@ -26,6 +26,7 @@ THE SOFTWARE.
 
 package ch.epfl.lis.gnwgui.windows;
 
+import ch.epfl.lis.gnw.GnwSettings;
 import ch.epfl.lis.gnwgui.GnwGuiSettings;
 import ch.epfl.lis.gnwgui.idesktop.IElement;
 import java.awt.BorderLayout;
@@ -150,10 +151,7 @@ public class TimeSeriesSelectionWindow extends GenericWindow
         
         private Vector<String> populateFileOptions(){
             Vector<String> vFiles = new Vector<String>();
-            String[] files = { "dream4_timeseries", "noexpnoise_dream4_timeseries"
-                    , "noexpnoise_proteins_dream4_timeseries", "nonoise_dream4_timeseries"
-                    , "nonoise_proteins_dream4_timeseries", "proteins_dream4_timeseries"};
-
+            String[] files = GnwSettings.getInstance().getTimeSeriesDataFiles();
             File file;
 
             for (int i = 0; i < files.length; i++){

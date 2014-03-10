@@ -208,6 +208,11 @@ public class GnwSettings {
 	private boolean stopSubnetExtraction_ = false;
 	private boolean stopBenchmarkGeneration_ = false;
 	
+        // File list for timeseries data
+        private String[] timeSeriesDataFiles = { "dream4_timeseries", "noexpnoise_dream4_timeseries"
+                    , "noexpnoise_proteins_dream4_timeseries", "nonoise_dream4_timeseries"
+                    , "nonoise_proteins_dream4_timeseries", "proteins_dream4_timeseries"}; 
+        
 	/** URL to the last settings file opened */
 	private URL lastSettingsURL_ = null;
 	
@@ -697,4 +702,7 @@ public class GnwSettings {
 	
 	public void stopBenchmarkGeneration(boolean b) { stopBenchmarkGeneration_ = b; }
 	public boolean stopBenchmarkGeneration() { return stopBenchmarkGeneration_; }
+
+        public String[] getTimeSeriesDataFiles() { return timeSeriesDataFiles; }
+        public void setTimeSeriesDataFiles(String[] f) { timeSeriesDataFiles = f; }
 }

@@ -376,9 +376,11 @@ public class Options extends OptionsWindow
                 
                 String path = GnwSettings.getInstance().getOutputDirectory();
                 System.out.println(path);
-                File f = new File(path + item_.getLabel() + ".xml");
+                String[] files = GnwSettings.getInstance().getTimeSeriesDataFiles();
+                //File f = new File(path + item_.getLabel() + ".xml");
 
-                if(f.exists())
+                
+                if(dataExists(path, files))
                 {                    
                         //** if so, display window to select time series type
                         dispose();
@@ -401,6 +403,18 @@ public class Options extends OptionsWindow
                 
         }
 	
+        // ----------------------------------------------------------------------------
+	public boolean dataExists(String path, String[] files){
+            File file;
+            for (int i = 0; i < files.length; i++){
+                file = new File(path + item_.getLabel() + "_" + files[i] + ".tsv");
+                if(file.exists()){
+                    return true;
+                }
+            }
+            return false;
+        }
+        
 	// ----------------------------------------------------------------------------
 	
 	public void setMenu(Byte menu)
