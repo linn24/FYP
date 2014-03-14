@@ -459,6 +459,7 @@ public class SteadyStateExperiment extends Experiment {
 		
 		try {
 			log_.log(Level.INFO, "Writing file " + filename);
+                        System.out.println("from steadystateexperiment");
 			FileWriter fw = new FileWriter(filename, false);
 
 			fw.write(grn_.getHeader(false));

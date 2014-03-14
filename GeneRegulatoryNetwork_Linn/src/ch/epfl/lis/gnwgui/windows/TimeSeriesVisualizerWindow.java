@@ -46,8 +46,7 @@ public class TimeSeriesVisualizerWindow extends GenericWindow
 	private static final long serialVersionUID = 1L;
 	
 	protected JPanel graphPanel_;
-	
-	
+		
     /** Logger for this class */
 	@SuppressWarnings("unused")
 	private static Logger log_ = Logger.getLogger(TimeSeriesVisualizerWindow.class.getName());
@@ -58,7 +57,7 @@ public class TimeSeriesVisualizerWindow extends GenericWindow
 	public TimeSeriesVisualizerWindow(Frame aFrame)
 	{	
 		super(aFrame, false);		
-		setSize(840, 665);
+                setSize(840, 665);
 		setHeaderTitle("Time Series Representation");
 		setTitle("Visualization");
                 setLocationRelativeTo(GnwGuiSettings.getInstance().getGnwGui().getFrame());

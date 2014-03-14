@@ -69,9 +69,9 @@ public class TimeSeriesComparerWindow extends TimeSeriesSelectionWindow
 	// ----------------------------------------------------------------------------
 	// PUBLIC METHODS
 	
-	public TimeSeriesComparerWindow(Frame aFrame, IElement item)
+	public TimeSeriesComparerWindow(Frame aFrame, IElement item, String path)
 	{	
-		super(aFrame, item);		
+		super(aFrame, item, path);		
 		setSize(840, 665);
 		setHeaderTitle("Time Series Comparison");
 		setTitle("Compare Different Versions of Time Series");

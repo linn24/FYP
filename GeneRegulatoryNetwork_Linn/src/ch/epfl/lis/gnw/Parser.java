@@ -76,7 +76,7 @@ public class Parser extends TSVParser {
 
 	/** Write the data to a TSV file */
 	public static void writeTSV(String filename, ArrayList<String[]> data) {
-		
+                System.out.println("from parser");
 		log_.info("Writing file " + filename);
 		try {
 			Parser.writeTSV(GnwSettings.getInstance().getURL(filename), data);
@@ -207,7 +207,7 @@ public class Parser extends TSVParser {
 	 * Write the network structure to a file in the format used for the DREAM gold standards
 	 */
 	public void writeGoldStandard() {
-		
+		          System.out.println("from parser goldstandard");
 		log_.log(Level.INFO, "Writing file " + absPath_.getPath());
 		
 		if (structure_ == null)

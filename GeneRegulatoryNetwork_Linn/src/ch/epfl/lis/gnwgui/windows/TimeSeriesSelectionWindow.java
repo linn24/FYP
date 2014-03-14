@@ -68,6 +68,7 @@ public class TimeSeriesSelectionWindow extends GenericWindow
         protected JScrollPane scrollPane_;
         
         protected IElement item_;
+        protected String path_;
 	
     /** Logger for this class */
 	@SuppressWarnings("unused")
@@ -76,10 +77,11 @@ public class TimeSeriesSelectionWindow extends GenericWindow
 	// ----------------------------------------------------------------------------
 	// PUBLIC METHODS
 	
-	public TimeSeriesSelectionWindow(Frame aFrame, IElement item)
+	public TimeSeriesSelectionWindow(Frame aFrame, IElement item, String path)
 	{	
 		super(aFrame, false);
                 this.item_ = item;
+                this.path_ = path;
 		setSize(840, 665);
 		setHeaderTitle("Time Series Selection");
 		setTitle("Select Time Series");
@@ -155,7 +157,7 @@ public class TimeSeriesSelectionWindow extends GenericWindow
             File file;
 
             for (int i = 0; i < files.length; i++){
-                file = new File(item_.getLabel() + "_" + files[i] + ".tsv");
+                file = new File(path_ + "\\" + item_.getLabel() + "_" + files[i] + ".tsv");
                 if(file.exists()){
                     vFiles.add(files[i]);
                 }        

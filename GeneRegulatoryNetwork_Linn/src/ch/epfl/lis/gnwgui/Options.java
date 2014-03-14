@@ -370,36 +370,40 @@ public class Options extends OptionsWindow
         
         public void visualizeTimeSeries(boolean compareData)
         {            
-                System.out.println("Implementing in progress...");
-                System.out.println(item_.getLabel());
                 //** check if the dataset for the present network has been generated
+                IODialog dialog = new IODialog(new Frame(""), "Select Existing Folder", 
+                                    GnwSettings.getInstance().getOutputDirectory(), IODialog.LOAD);
+				
+                dialog.selectOnlyFolder(true);
+                dialog.display();
                 
                 String path = GnwSettings.getInstance().getOutputDirectory();
-                System.out.println(path);
-                String[] files = GnwSettings.getInstance().getTimeSeriesDataFiles();
-                //File f = new File(path + item_.getLabel() + ".xml");
+                
+                if (dialog.getSelection() != null){
+                    path = dialog.getSelection();
+                    String[] files = GnwSettings.getInstance().getTimeSeriesDataFiles();
+                    //File f = new File(path + item_.getLabel() + ".xml");
 
-                
-                if(dataExists(path, files))
-                {                    
-                        //** if so, display window to select time series type
-                        dispose();
-                        if (compareData){
-                            TimeSeriesComparer tsm = new TimeSeriesComparer(GnwGuiSettings.getInstance().getGnwGui().getFrame(), item_);
-                            tsm.setVisible(true);
-                        }else{
-                            TimeSeriesSelection tss = new TimeSeriesSelection(GnwGuiSettings.getInstance().getGnwGui().getFrame(), item_);
-                            tss.setVisible(true);
-                        }
+
+                    if(dataExists(path, files)){
+                            //** if so, display window to select time series type
+                            dispose();
+                            if (compareData){
+                                TimeSeriesComparer tsm = new TimeSeriesComparer(GnwGuiSettings.getInstance().getGnwGui().getFrame(), item_, path);
+                                tsm.setVisible(true);
+                            }else{
+                                TimeSeriesSelection tss = new TimeSeriesSelection(GnwGuiSettings.getInstance().getGnwGui().getFrame(), item_, path);
+                                tss.setVisible(true);
+                            }
+                    }else{                        
+                            //** if not, prompt to generate dataset first
+                            JOptionPane.showMessageDialog(null, 
+                                    "Dataset for this network has not been generated yet." +
+                                    "\nPlease generate dataset first before proceeding to visualize time series data.", 
+                                    "Dataset Not Found", JOptionPane.INFORMATION_MESSAGE);
+                    }
                 }
-                else
-                {                        //** if not, prompt to generate dataset first
-                        JOptionPane.showMessageDialog(null, 
-                                "Dataset for this network has not been generated yet." +
-                                "\nPlease generate dataset first before proceeding to visualize time series data.", 
-                                "Dataset Not Found", JOptionPane.INFORMATION_MESSAGE);
-                }
-                
+                System.out.println(path);
                 
         }
 	
@@ -407,7 +411,8 @@ public class Options extends OptionsWindow
 	public boolean dataExists(String path, String[] files){
             File file;
             for (int i = 0; i < files.length; i++){
-                file = new File(path + item_.getLabel() + "_" + files[i] + ".tsv");
+                file = new File(path + "\\" + item_.getLabel() + "_" + files[i] + ".tsv");
+                System.out.println(path + "\\" + item_.getLabel() + "_" + files[i] + ".tsv");
                 if(file.exists()){
                     return true;
                 }

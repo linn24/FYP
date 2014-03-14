@@ -387,7 +387,7 @@ public class GeneNetwork extends ImodNetwork {
 		
 		Model model = new Model(id_);
 		model.getNotes ().add (comment_); // save network description
-		
+		          System.out.println("from genenetwork");
 		log_.log(Level.INFO, "Writing file " + filename.getPath());
 		
 		int size = getSize();

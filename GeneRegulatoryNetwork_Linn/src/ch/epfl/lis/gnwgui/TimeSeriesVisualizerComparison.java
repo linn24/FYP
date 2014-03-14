@@ -109,8 +109,19 @@ public class TimeSeriesVisualizerComparison extends TimeSeriesVisualizerWindow {
     
     public void clearDataLists(){
         lstData = new Vector<double[]>();
-        lstFixedData = new Vector<double[]>();
+        lstFixedData = new Vector<double[]>();    
+    }
     
+    public void clearCurrentDataLists(){
+        lstCurrentData = new Vector<double[]>();
+        lstFixedCurrentData = new Vector<double[]>();
+        lstCurrentTimeStamp = new Vector<String>();
+    }
+    
+    public void clearCompareDataLists(){
+        lstCompareData = new Vector<double[]>();
+        lstFixedCompareData = new Vector<double[]>();
+        lstCompareTimeStamp = new Vector<String>();    
     }
     
     
@@ -123,13 +134,13 @@ public class TimeSeriesVisualizerComparison extends TimeSeriesVisualizerWindow {
     }
     
     
-    public void readFile(String fileName, Vector<double[]> lstData, Vector<double[]> lstFixedData, Vector<String> lstTimeStamp, int option){
+    public void readFile(String path, String fileName, Vector<double[]> lstData, Vector<double[]> lstFixedData, Vector<String> lstTimeStamp, int option){
         
         try{
             
             // Open the file that is the first 
             // command line parameter
-            FileInputStream fstream = new FileInputStream(fileName);
+            FileInputStream fstream = new FileInputStream(path + "\\" + fileName);
             // Get the object of DataInputStream
             DataInputStream in = new DataInputStream(fstream);
             BufferedReader br = new BufferedReader(new InputStreamReader(in));
@@ -322,6 +333,7 @@ public class TimeSeriesVisualizerComparison extends TimeSeriesVisualizerWindow {
                 genes =  append(genes, g);;
             }
         }
+        System.out.println("common genes loaded");
     }
     
     public int getCommonTimeSeries(){

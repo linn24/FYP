@@ -29,8 +29,8 @@ public class TimeSeriesSelection extends TimeSeriesSelectionWindow {
     int totalTimeSeries;
     
     
-    public TimeSeriesSelection(Frame aFrame, IElement item) {
-        super(aFrame, item);
+    public TimeSeriesSelection(Frame aFrame, IElement item, String path) {
+        super(aFrame, item, path);
         visualizer_ = new TimeSeriesVisualizer(GnwGuiSettings.getInstance().getGnwGui().getFrame());
         System.out.println("after creating a new visualizer:: total number of genes is " + visualizer_.getTotalGenes());
     
@@ -76,7 +76,7 @@ public class TimeSeriesSelection extends TimeSeriesSelectionWindow {
     
     protected void updateCombo(String name) {
         visualizer_.clearDataLists();
-        visualizer_.readFile(name + ".tsv");
+        visualizer_.readFile(path_, name + ".tsv");
         totalTimeSeries = visualizer_.getTotalTimeSeries();
         timeSeries.clear();
         

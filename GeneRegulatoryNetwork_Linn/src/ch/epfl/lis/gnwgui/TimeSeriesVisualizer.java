@@ -56,12 +56,12 @@ public class TimeSeriesVisualizer extends TimeSeriesVisualizerWindow {
         return arr;
     }
     
-    public void readFile(String fileName){
+    public void readFile(String path, String fileName){
         try{
             
             // Open the file that is the first 
             // command line parameter
-            FileInputStream fstream = new FileInputStream(fileName);
+            FileInputStream fstream = new FileInputStream(path + "\\" + fileName);
             // Get the object of DataInputStream
             DataInputStream in = new DataInputStream(fstream);
             BufferedReader br = new BufferedReader(new InputStreamReader(in));

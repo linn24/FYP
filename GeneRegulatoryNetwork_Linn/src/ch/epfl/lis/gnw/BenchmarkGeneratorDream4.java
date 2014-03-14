@@ -529,6 +529,7 @@ public class BenchmarkGeneratorDream4 extends BenchmarkGenerator
 		// save the coefficient
 		String filename = outputDirectory_ + grn_.getId() + "_normalization_constant.tsv";
 		log_.log(Level.INFO, "Writing file " + filename);
+                System.out.println("from benchmarkgeneratordream4");
 		try {
 			FileWriter fw = new FileWriter(filename, false);
 			fw.write(Double.toString(max) + "\n");

@@ -99,6 +99,7 @@ public abstract class Perturbation {
 		try {
 			String filename = directory + grn_.getId() + "_" + postfix + "_perturbations.tsv";
 			log_.log(Level.INFO, "Writing file " + filename);
+                        System.out.println("from perturbation");
 			FileWriter fw = new FileWriter(filename, false);
 			
 			// Header

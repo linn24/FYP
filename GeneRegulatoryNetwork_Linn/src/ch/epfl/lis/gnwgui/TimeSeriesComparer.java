@@ -46,13 +46,14 @@ public class TimeSeriesComparer extends TimeSeriesComparerWindow {
     protected static IElement itemToCompare_ = null;
     
     String[] arrGenes = null;
+    static String comparePath_;
     
     /** Logger for this class */
     private static Logger log_ = Logger.getLogger(IONetwork.class.getName());
 
     
-    public TimeSeriesComparer(Frame aFrame, IElement item) {
-        super(aFrame, item);
+    public TimeSeriesComparer(Frame aFrame, IElement item, String path) {
+        super(aFrame, item, path);
         visualizer_ = new TimeSeriesVisualizerComparison(GnwGuiSettings.getInstance().getGnwGui().getFrame());
         secondVisualizer_ = new TimeSeriesVisualizerComparison(GnwGuiSettings.getInstance().getGnwGui().getFrame());
                             
@@ -112,23 +113,49 @@ public class TimeSeriesComparer extends TimeSeriesComparerWindow {
                     public void actionPerformed(ActionEvent e) {
                         open();     
                         if (itemToCompare_ != null){
-                            // enable list selection when another network has been selected
-                            geneList_.setEnabled(true);
-                            fileList_.setEnabled(true);
-                            timeSeriesList_.setEnabled(true);
-                            oneWin_.setEnabled(true);
-                            twoWin_.setEnabled(true);
-                            
-                            selected_.setText(itemToCompare_.getLabel());
-                            System.out.println("compare");
-                            visualizer_.clearDataLists();
-                            visualizer_.readFile(itemToCompare_.getLabel() + "_" + fileList_.getSelectedItem().toString() + ".tsv"
-                                    , visualizer_.lstCompareData, visualizer_.lstFixedCompareData, visualizer_.lstCompareTimeStamp, 2);
-                            visualizer_.setCompareGenesHash(visualizer_.hashGeneList(visualizer_.compareGenes));  
-                            visualizer_.getCommonGenes();
-                            updateCombo();
-                            //updateGraph();
-                            checkWindow();
+                            IODialog dialog = new IODialog(new Frame(""), "Select Existing Folder", 
+                                                GnwSettings.getInstance().getOutputDirectory(), IODialog.LOAD);
+
+                            dialog.selectOnlyFolder(true);
+                            dialog.display();
+
+                            String path = GnwSettings.getInstance().getOutputDirectory();
+
+                            if (dialog.getSelection() != null){
+                                path = dialog.getSelection();
+                                String[] files = new String[fileList_.getItemCount()];
+                                for (int i = 0; i < fileList_.getItemCount(); i++){
+                                    files[i] = fileList_.getItemAt(i).toString();
+                                }
+
+                                if(dataExists(path, itemToCompare_.getLabel(), files)){
+                                    comparePath_ = path;
+                                    // enable list selection when another network has been selected
+                                    geneList_.setEnabled(true);
+                                    fileList_.setEnabled(true);
+                                    timeSeriesList_.setEnabled(true);
+                                    oneWin_.setEnabled(true);
+                                    twoWin_.setEnabled(true);
+
+                                    selected_.setText(itemToCompare_.getLabel());
+                                    System.out.println("compare");
+                                    visualizer_.clearDataLists();
+                                    visualizer_.clearCompareDataLists();
+                                    visualizer_.readFile(comparePath_, itemToCompare_.getLabel() + "_" + fileList_.getSelectedItem().toString() + ".tsv"
+                                            , visualizer_.lstCompareData, visualizer_.lstFixedCompareData, visualizer_.lstCompareTimeStamp, 2);
+                                    visualizer_.setCompareGenesHash(visualizer_.hashGeneList(visualizer_.compareGenes));  
+                                    visualizer_.getCommonGenes();
+                                    updateCombo();
+                                    //updateGraph();
+                                    checkWindow();
+                                }else{
+                                    //** if not, prompt to generate dataset first
+                                    JOptionPane.showMessageDialog(null, 
+                                            "Dataset for this network has not been generated yet." +
+                                            "\nPlease generate dataset first before proceeding to visualize time series data.", 
+                                            "Dataset Not Found", JOptionPane.INFORMATION_MESSAGE);
+                                }
+                            }
                         }                       
         
                     }
@@ -144,11 +171,11 @@ public class TimeSeriesComparer extends TimeSeriesComparerWindow {
                         String fileName = (String)cb.getSelectedItem();
                         visualizer_.clearDataLists();        
                         if(itemToCompare_ != null){
-                            visualizer_.readFile(itemToCompare_.getLabel() + "_" + fileList_.getSelectedItem().toString() + ".tsv"
+                            visualizer_.readFile(comparePath_, itemToCompare_.getLabel() + "_" + fileList_.getSelectedItem().toString() + ".tsv"
                                     , visualizer_.lstCompareData, visualizer_.lstFixedCompareData, visualizer_.lstCompareTimeStamp, 2);
                         visualizer_.setCompareGenesHash(visualizer_.hashGeneList(visualizer_.compareGenes));            
                         }
-                        visualizer_.readFile(item_.getLabel() + "_" + fileName + ".tsv"
+                        visualizer_.readFile(path_, item_.getLabel() + "_" + fileName + ".tsv"
                                 , visualizer_.lstCurrentData, visualizer_.lstFixedCurrentData, visualizer_.lstCurrentTimeStamp, 1);
                         visualizer_.setCurrentGenesHash(visualizer_.hashGeneList(visualizer_.currentGenes));
                         visualizer_.getCommonGenes();
@@ -175,13 +202,25 @@ public class TimeSeriesComparer extends TimeSeriesComparerWindow {
         }
         
         visualizer_.clearDataLists();        
-        visualizer_.readFile(item_.getLabel() + "_" + fileList_.getSelectedItem().toString() + ".tsv"
+        visualizer_.readFile(path_, item_.getLabel() + "_" + fileList_.getSelectedItem().toString() + ".tsv"
                 , visualizer_.lstCurrentData, visualizer_.lstFixedCurrentData, visualizer_.lstCurrentTimeStamp, 1);
         System.out.println("lstFixedCurrentData.size(): " + visualizer_.lstFixedCurrentData.size());
         System.out.println("currentGenes.length: " + visualizer_.currentGenes.length);
         visualizer_.setCurrentGenesHash(visualizer_.hashGeneList(visualizer_.currentGenes));
         updateCombo();
         
+    }
+                    
+    public boolean dataExists(String path, String fileName, String[] files){
+        File file;
+        for (int i = 0; i < files.length; i++){
+            file = new File(path + "\\" + fileName + "_" + files[i] + ".tsv");
+            System.out.println(path + "\\" + fileName + "_" + files[i] + ".tsv");
+            if(!file.exists()){
+                return false;
+            }
+        }
+        return true;
     }
 
     protected void checkWindow(){
@@ -358,7 +397,7 @@ public class TimeSeriesComparer extends TimeSeriesComparerWindow {
         Wait wait = new Wait(GnwGuiSettings.getInstance().getGnwGui().getFrame(), true);
         wait.setTitle("Open Network");
         TimeSeriesComparer.NetworkImport ni = new TimeSeriesComparer.NetworkImport(wait);
-
+        
         ni.fileAbsPath_ = dialog.getSelection();
         ni.f_ = dialog.getSelectedFilter();
 

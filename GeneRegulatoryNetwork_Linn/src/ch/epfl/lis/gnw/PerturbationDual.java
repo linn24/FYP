@@ -100,6 +100,7 @@ public class PerturbationDual extends PerturbationSingleGene {
 			try {
 				String filename = directory + grn_.getId() + "_" + postfix + "_indexes.tsv";
 				log_.log(Level.INFO, "Writing file " + filename);
+                                System.out.println("from perturbationdual");
 				FileWriter fw = new FileWriter(filename, false);
 
 				// Header
