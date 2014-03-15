@@ -26,6 +26,7 @@ THE SOFTWARE.
 
 package ch.epfl.lis.gnwgui;
 
+import ch.epfl.lis.gnw.Gene;
 import ch.epfl.lis.gnw.GeneNetwork;
 import edu.uci.ics.jung.algorithms.layout.AbstractLayout;
 import edu.uci.ics.jung.algorithms.layout.FRLayout;
@@ -310,7 +311,6 @@ public class NetworkGraph {
         gm_.setMode(ModalGraphMouse.Mode.TRANSFORMING);
         vv_.setGraphMouse(gm_);
         
-            System.out.println("add actions");
         setScreen(vv_); // Draw the viewer into the panel displayed
         addPrintAction(screen_); // Add the key action ALT-P to print the JPanel screen_
         addDeleteAction(screen_); // Add the key action Ctrl-D to delete selected nodes
@@ -326,7 +326,7 @@ public class NetworkGraph {
 		} catch (Exception e) {
 			log_.log(Level.WARNING, "NetworkGraph::computeGraph(): " + e.getMessage(), e);
 		}
-	}
+            }
 	
 	
 	/**
@@ -456,7 +456,7 @@ public class NetworkGraph {
             jp.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(k, "deletenode");
             jp.getActionMap().put("deletenode", new AbstractAction() {
                 public void actionPerformed(ActionEvent arg0) {
-                    if (control_.interactionMode_.getSelectedIndex() == 1){
+                    if (control_.interactionMode_.getSelectedIndex() == 1 && !(item_ instanceof DynamicalModelElement)){
                         //item_.getNetworkViewer().getControl().printGraph();
 
                         Set<Node> picked_nodes = pickedState_.getPicked();
@@ -624,7 +624,7 @@ public class NetworkGraph {
             jp.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(k, "deleteedge");
             jp.getActionMap().put("deleteedge", new AbstractAction() {
                 public void actionPerformed(ActionEvent arg0) {
-                    if (control_.interactionMode_.getSelectedIndex() == 2){
+                    if (control_.interactionMode_.getSelectedIndex() == 2 && !(item_ instanceof DynamicalModelElement)){
                         Set<Edge> picked_edges = pickedEdges_.getPicked();
                         System.out.println("picked:" + picked_edges.size());
                         
@@ -635,7 +635,8 @@ public class NetworkGraph {
 
                             int n = JOptionPane.showConfirmDialog(
                                             new JFrame(),
-                                            "Are you sure that you want to delete the selected edges?", 
+                                            picked_edges.size() + " edge(s) is/are picked." +
+                                            "\nAre you sure that you want to delete the selected edges?", 
                                             "Delete Edges",
                                             JOptionPane.YES_NO_OPTION,
                                             JOptionPane.QUESTION_MESSAGE,
@@ -793,7 +794,7 @@ public class NetworkGraph {
             jp.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(k, "createedge");
             jp.getActionMap().put("createedge", new AbstractAction() {
                 public void actionPerformed(ActionEvent arg0) {
-                    if (control_.interactionMode_.getSelectedIndex() == 2){
+                    if (control_.interactionMode_.getSelectedIndex() == 2 && !(item_ instanceof DynamicalModelElement)){
                         //item_.getNetworkViewer().getControl().printGraph();
 
                         Set<Node> picked_nodes = pickedState_.getPicked();
@@ -805,88 +806,142 @@ public class NetworkGraph {
                             Iterator<Node> nodeIt = picked_nodes.iterator();
                             firstNode = nodeIt.next();
                             secondNode = nodeIt.next();
-                            int selectedNode;
+                            int selectedNode, selectedType;
                             ImageIcon icon = new ImageIcon(GnwGuiSettings.getInstance().getStructureIcon());
 
                             /* use this if there can exist only one edge between two nodes */
                             if (structure_.getEdge(firstNode, secondNode) == null && structure_.getEdge(secondNode, firstNode) == null){
 
-                                String[] options = new String[] {firstNode.getLabel(), secondNode.getLabel()};
+                                String[] options = new String[] {firstNode.getLabel(), secondNode.getLabel(), "Cancel"};
                                 selectedNode = JOptionPane.showOptionDialog(
-                                        new JFrame(), "Select Source Node", 
-                                        "Please select one of the nodes as source node.", 
+                                        new JFrame(),  
+                                        "Please select one of the nodes as source node.",
+                                        "Select Source Node",
                                         JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,
                                         icon, options, options[0]);
 
                                 System.out.println("Selected: " + selectedNode);
-
-                                // ask user to select type of the edge too
-                                switch(selectedNode){
-                                    case 0:
-                                        edgeToCreate = new Edge(firstNode, secondNode);//, type
-                                        break;
-                                    case 1:
-                                        edgeToCreate = new Edge(secondNode, firstNode);//, type
-                                        break;
-                                }
-
-                            // check if the edge already exists
-                            
-                            /* use this if there can exist more than one edges between two nodes */
-                            //if (structure_.getEdge(edgeToCreate.getSource(), edgeToCreate.getTarget()) == null){
                                 
-                            
-                                // confirm to delete edge
-                                int n = JOptionPane.showConfirmDialog(
-                                        new JFrame(),
-                                        "Are you sure that you want to create an edge from "
-                                        + edgeToCreate.getSource() + " to " + edgeToCreate.getTarget() + "?", 
-                                        "Create Edge",
-                                        JOptionPane.YES_NO_OPTION,
-                                        JOptionPane.QUESTION_MESSAGE,
-                                        icon);
-
-
-                                if (n == JOptionPane.YES_OPTION){
-
-                                    // copy the current network into a temporary network
-                                    if (noChanges){
-                                        tempStructure_ = structure_.copy();
-                                        noChanges = false;
-                                    }
-
-                                    System.out.println("total number of nodes in original network is " + tempStructure_.getSize());
-                                    System.out.println("total number of edges in original network is " + tempStructure_.getNumEdges());
-
-                                    // delete the picked edge                                
-                                    System.out.println("before: " + structure_.getNumEdges());
-                                    ArrayList<Edge> edges = new ArrayList<Edge>();
-                                    edges = structure_.getEdges();
-
-                                    if(edges.add(edgeToCreate)){
-                                        structure_.setEdges(edges);
-                                    }
-                                    System.out.println("after: " + structure_.getNumEdges());
-
-                                    msg += "The edge from " + edgeToCreate.getSource().getLabel() + " to " + 
-                                            edgeToCreate.getTarget().getLabel() + " has been created successfully.";
-
-                                    // update item_
-                                    if (item_ instanceof StructureElement) {
-                                        ((StructureElement)item_).setNetwork(new ImodNetwork(structure_));
-                                        //structure_ = (.getNetwork();
-                                    } else if (item_ instanceof DynamicalModelElement) {
-                                        ((DynamicalModelElement)item_).setGeneNetwork(new GeneNetwork(structure_));
+                                if (selectedNode != 2 && selectedNode != -1){
+                                    switch(selectedNode){
+                                        case 0:
+                                            edgeToCreate = new Edge(firstNode, secondNode);//, type
+                                            break;
+                                        case 1:
+                                            edgeToCreate = new Edge(secondNode, firstNode);//, type
+                                            break;
                                     }
                                     
-                                    netSize_ = structure_.getSize();
-                                    computeGraph();
-                                    control_.resetControlSetting();
+                                    /*
+                                    options = new String[] {"Enhancer", "Inhibitor", "Dual", "Unknown", "Cancel"};
+                                    selectedType = JOptionPane.showOptionDialog(
+                                            new JFrame(), 
+                                            "Please select one of the types for the edge.",
+                                            "Select Type", 
+                                            JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,
+                                            icon, options, options[0]);
 
-                                    JOptionPane.showMessageDialog(null, 
-                                            msg,
-                                            "Edge Created", JOptionPane.INFORMATION_MESSAGE);
 
+                                    System.out.println("Selected: " + selectedType);
+                                    
+                                    
+                                    if (selectedType != 4 && selectedType != -1){
+                                        switch(selectedType){
+                                            case 0:
+                                                edgeToCreate.setType(Edge.ENHANCER);
+                                                break;
+                                            case 1:
+                                                edgeToCreate.setType(Edge.INHIBITOR);
+                                                break;
+                                            case 2:
+                                                edgeToCreate.setType(Edge.DUAL);
+                                                break;
+                                            case 3:
+                                                edgeToCreate.setType(Edge.UNKNOWN);
+                                                break;
+                                        }
+                                        */
+                                    System.out.println("before:");
+                                        if (item_ instanceof DynamicalModelElement){
+                                            
+                                            Gene g;
+                                            for (int j = 0; j < structure_.getSize(); j++){
+                                                g = (Gene) structure_.getNode(j);
+                                                System.out.println("input for " + g.getLabel() + ": " + g.getInputGenes().size());
+                                                
+                                            }
+                                        }
+                                    // check if the edge already exists
+
+                                    /* use this if there can exist more than one edges between two nodes */
+                                    //if (structure_.getEdge(edgeToCreate.getSource(), edgeToCreate.getTarget()) == null){
+
+
+                                        // confirm to delete edge
+                                        int n = JOptionPane.showConfirmDialog(
+                                                new JFrame(),
+                                                "Are you sure that you want to create an edge from "
+                                                + edgeToCreate.getSource().getLabel() + " to " + edgeToCreate.getTarget().getLabel() + "?", 
+                                                "Create Edge",
+                                                JOptionPane.YES_NO_OPTION,
+                                                JOptionPane.QUESTION_MESSAGE,
+                                                icon);
+
+
+                                        if (n == JOptionPane.YES_OPTION){
+
+                                            // copy the current network into a temporary network
+                                            if (noChanges){
+                                                tempStructure_ = structure_.copy();
+                                                noChanges = false;
+                                            }
+
+                                            System.out.println("total number of nodes in original network is " + tempStructure_.getSize());
+                                            System.out.println("total number of edges in original network is " + tempStructure_.getNumEdges());
+
+                                            // delete the picked edge                                
+                                            System.out.println("before: " + structure_.getNumEdges());
+                                            ArrayList<Edge> edges = new ArrayList<Edge>();
+                                            edges = structure_.getEdges();
+
+                                            if(edges.add(edgeToCreate)){
+                                                structure_.setEdges(edges);
+                                            }
+                                            System.out.println("after: " + structure_.getNumEdges());
+
+                                            msg += "The edge from " + edgeToCreate.getSource().getLabel() + " to " + 
+                                                    edgeToCreate.getTarget().getLabel() + " has been created successfully.";
+
+                                            // update item_
+                                            if (item_ instanceof StructureElement) {
+                                                ((StructureElement)item_).setNetwork(new ImodNetwork(structure_));
+                                                //structure_ = (.getNetwork();
+                                            } else if (item_ instanceof DynamicalModelElement) {
+                                                ((DynamicalModelElement)item_).setGeneNetwork(new GeneNetwork(structure_));
+                                                System.out.println("gene network updated");
+                                            }
+                                            
+                                            System.out.println("after");
+                                            if (item_ instanceof DynamicalModelElement){
+                                            
+                                                Gene g;
+                                                for (int j = 0; j < structure_.getSize(); j++){
+                                                    g = (Gene) structure_.getNode(j);
+                                                    System.out.println("input for " + g.getLabel() + ": " + g.getInputGenes().size());
+
+                                                }
+                                            }
+
+                                            netSize_ = structure_.getSize();
+                                            computeGraph();
+                                            control_.resetControlSetting();
+
+                                            JOptionPane.showMessageDialog(null, 
+                                                    msg,
+                                                    "Edge Created", JOptionPane.INFORMATION_MESSAGE);
+
+                                        }
+                                    //}
                                 }
                             }else{
                                 JOptionPane.showMessageDialog(null, 

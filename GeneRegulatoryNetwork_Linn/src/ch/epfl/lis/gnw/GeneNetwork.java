@@ -429,15 +429,15 @@ public class GeneNetwork extends ImodNetwork {
 			// SYNTHESIS REACTION
 			KineticLaw kineticLaw = new KineticLaw ();
 			String reactionId = currentGeneID + "_synthesis";
-			String name = reactionId + ": " + ((Gene)nodes_.get(i)).toString();
-			Reaction reaction = new Reaction (reactionId, name);
+                        String name = reactionId + ": " + ((Gene)nodes_.get(i)).toString();
+                        Reaction reaction = new Reaction (reactionId, name);
 			reaction.setReversible (false);
 			reaction.addReactant(species[size]);
 			reaction.addProduct(species[i]);
-			for (int r=0; r<inputIndexes.size(); r++) // set gene modifiers
-//				reaction.addModifier(species[inputIndexes.get(r)]);
-				reaction.addModifier(species[nodes_.indexOf(inputIndexes.get(r))]);
-  
+                        for (int r=0; r<inputIndexes.size(); r++) // set gene modifiers
+    //				reaction.addModifier(species[inputIndexes.get(r)]);
+                                    reaction.addModifier(species[nodes_.indexOf(inputIndexes.get(r))]);
+                        
 			ArrayList<String> names = new ArrayList<String>(); // parameters names
 			ArrayList<Double> values = new ArrayList<Double>(); // parameters values
 			((Gene)nodes_.get(i)).compileParameters(names, values);

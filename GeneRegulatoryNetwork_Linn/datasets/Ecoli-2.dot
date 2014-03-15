@@ -1,0 +1,23 @@
+digraph "Ecoli-2" {
+	rankdir=LR;
+	"fiu" [position="195,171"];
+	"fur" [position="105,123"];
+	"fepD" [position="19,177"];
+	"fepC" [position="101,22"];
+	"exbB" [position="204,102"];
+	"yhhY" [position="167,44"];
+	"entS" [position="37,48"];
+	"ydfN" [position="143,217"];
+	"nohA" [position="5,109"];
+	"exbD" [position="74,220"];
+	"fur" -> "exbB" [value="-"];
+	"fur" -> "exbD" [value="-"];
+	"fur" -> "fepC" [value="-"];
+	"fur" -> "fepD" [value="-"];
+	"fur" -> "fur" [value="-"];
+	"fur" -> "entS" [value="+-"];
+	"fur" -> "nohA" [value="-"];
+	"fur" -> "fiu" [value="-"];
+	"fur" -> "ydfN" [value="-"];
+	"fur" -> "yhhY" [value="-"];
+}
