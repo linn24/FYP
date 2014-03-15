@@ -33,6 +33,7 @@ import java.util.logging.Logger;
 import org.apache.commons.collections15.Transformer;
 
 import ch.epfl.lis.networks.Edge;
+import edu.uci.ics.jung.visualization.picking.PickedInfo;
 
 /** This transformer defines the color of the interactions of the graph visualizations.
  * 
@@ -60,6 +61,9 @@ public class EdgeArrowColorTransformer<E> implements Transformer<E,Paint> {
 	private Color dualColor_ = null;
 	/** Arrow of the unknown connections */
 	private Color unknownColor_ = null;
+        
+        /** Pick info */
+        private PickedInfo<E> pi_ = null;
 
     /** Logger for this class */
     @SuppressWarnings("unused")
@@ -78,34 +82,41 @@ public class EdgeArrowColorTransformer<E> implements Transformer<E,Paint> {
 	
 	/**
 	 * Constructor
+         * @param pi
 	 */
-	public EdgeArrowColorTransformer() {
+	public EdgeArrowColorTransformer(PickedInfo<E> pi) {
 		initialize();
 		distinguishConnectionByColor(true);
+                pi_ = pi;
 	}
 	
 	/**
 	 * This constructor allows to distinguish or not the signed connections by their
 	 * edge/arrow color.
 	 * @param distinguishSignedConnections
+         * @param pi
 	 */
-	public EdgeArrowColorTransformer(boolean distinguishSignedConnections) {
+	public EdgeArrowColorTransformer(boolean distinguishSignedConnections, PickedInfo<E> pi) {
 		initialize();
 		distinguishConnectionByColor(distinguishSignedConnections);
+                pi_ = pi;
 	}
 	
 	/**
 	 * Constructor with edge/arrow color specified.
 	 * @param enhancerColor Color of the enhancer interactions
 	 * @param inhibitorColor Color of the inhibitory interactions
-	 * @param unknownColor Color of the unknown interactions
+         * @param dualColor Color of the dual interactions
+         * @param unknownColor Color of the unknown interactions
+         * @param pi
 	 */
-	public EdgeArrowColorTransformer(Color enhancerColor, Color inhibitorColor, Color dualColor, Color unknownColor) {
+	public EdgeArrowColorTransformer(Color enhancerColor, Color inhibitorColor, Color dualColor, Color unknownColor, PickedInfo<E> pi) {
 		initialize();
 		enhancerColor_ = enhancerColor;
 		inhibitoryColor_ = inhibitorColor;
 		dualColor_ = dualColor;
 		unknownColor_ = unknownColor;
+                pi_ = pi;
 	}
 
     /**
@@ -116,16 +127,20 @@ public class EdgeArrowColorTransformer<E> implements Transformer<E,Paint> {
 		Edge edge = (Edge) e;
 		Byte type = edge.getType();
 		
-		if (type.equals(enhancerType_))
-			return enhancerColor_;
-		else if (type.equals(inhibitorType_))
-			return inhibitoryColor_;
-		else if (type.equals(dualType_))
-			return dualColor_;
-		else if (type.equals(unknownType_))
-			return unknownColor_;
-		else
-			return Color.BLACK;
+                if (pi_.isPicked(e)){
+                    return Color.GREEN;
+                }else{
+                    if (type.equals(enhancerType_))
+                            return enhancerColor_;
+                    else if (type.equals(inhibitorType_))
+                            return inhibitoryColor_;
+                    else if (type.equals(dualType_))
+                            return dualColor_;
+                    else if (type.equals(unknownType_))
+                            return unknownColor_;
+                    else
+                            return Color.BLACK;
+                }
 	}
 	
 	/**
