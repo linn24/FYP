@@ -62,7 +62,7 @@ public class GraphViewerController extends JPanel {
 	protected JPanel controlerPanel_;
 	
 	/** Switch "Move graph"/"Move nodes" */
-	protected JComboBox interactionMode_;
+	public JComboBox interactionMode_;
 	/** Selection of different graph layouts */
 	protected JComboBox layoutCombo_;
 	
