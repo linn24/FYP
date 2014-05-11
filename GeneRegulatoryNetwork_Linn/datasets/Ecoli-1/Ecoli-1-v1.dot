@@ -1,0 +1,24 @@
+digraph "Ecoli-1" {
+	rankdir=LR;
+	"alkA";
+	"ada";
+	"alkB";
+	"aidB";
+	"lrp";
+	"lysU";
+	"livG";
+	"livJ";
+	"livK";
+	"kbl";
+	"ada" -> "ada" [value="+-"];
+	"ada" -> "alkB" [value="+-"];
+	"ada" -> "alkA" [value="+"];
+	"ada" -> "aidB" [value="+"];
+	"lrp" -> "kbl" [value="+"];
+	"lrp" -> "livG" [value="-"];
+	"lrp" -> "livJ" [value="-"];
+	"lrp" -> "livK" [value="-"];
+	"lrp" -> "lrp" [value="-"];
+	"lrp" -> "lysU" [value="-"];
+	"lrp" -> "aidB" [value="-"];
+}

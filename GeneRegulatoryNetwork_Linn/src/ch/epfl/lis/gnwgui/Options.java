@@ -412,7 +412,6 @@ public class Options extends OptionsWindow
             File file;
             for (int i = 0; i < files.length; i++){
                 file = new File(path + "\\" + item_.getLabel() + "_" + files[i] + ".tsv");
-                System.out.println(path + "\\" + item_.getLabel() + "_" + files[i] + ".tsv");
                 if(file.exists()){
                     return true;
                 }

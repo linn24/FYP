@@ -113,7 +113,7 @@ public class GraphViewer extends GraphViewerWindow {
 				text +=		  "ALT-P" + "\t" + "Export as image\n";
                                 text +=		  "CTRL-D" + "\t" + "Delete selected nodes" + "\n";
                                 text +=		  "CTRL-E" + "\t" + "Delete edge between selected nodes" + "\n";                                
-                                text +=		  "CTRL-A" + "\t" + "Create edge between selected nodes" + "\n";
+                                text +=		  "CTRL-N" + "\t" + "Create edge between selected nodes" + "\n";
                                 text +=		  "CTRL-S" + "\t" + "Save modified network structure" + "\n";
 				text +=		  "ESC" + "\t" + "Close window" + "\n";
 				

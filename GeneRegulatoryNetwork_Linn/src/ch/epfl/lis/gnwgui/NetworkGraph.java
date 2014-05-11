@@ -315,7 +315,7 @@ public class NetworkGraph {
         addPrintAction(screen_); // Add the key action ALT-P to print the JPanel screen_
         addDeleteAction(screen_); // Add the key action Ctrl-D to delete selected nodes
         addDeleteEdgeAction(screen_); // Add the key action Ctrl-E to delete selected edge
-        addCreateEdgeAction(screen_); // Add the key action Ctrl-A to create a new edge
+        addCreateEdgeAction(screen_); // Add the key action Ctrl-N to create a new edge
         addSaveAction(screen_); // Add the key action Ctrl-S to save the changes
         
         // Finally, add the signature at the low-bottom corner of the graph visualization
@@ -790,7 +790,7 @@ public class NetworkGraph {
         
         @SuppressWarnings("serial")
         public void addCreateEdgeAction(JComponent jp) {
-            KeyStroke k = KeyStroke.getKeyStroke("control A");
+            KeyStroke k = KeyStroke.getKeyStroke("control N");
             jp.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(k, "createedge");
             jp.getActionMap().put("createedge", new AbstractAction() {
                 public void actionPerformed(ActionEvent arg0) {

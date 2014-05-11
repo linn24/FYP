@@ -209,9 +209,12 @@ public class GnwSettings {
 	private boolean stopBenchmarkGeneration_ = false;
 	
         // File list for timeseries data
-        private String[] timeSeriesDataFiles = { "dream4_timeseries", "noexpnoise_dream4_timeseries"
-                    , "noexpnoise_proteins_dream4_timeseries", "nonoise_dream4_timeseries"
-                    , "nonoise_proteins_dream4_timeseries", "proteins_dream4_timeseries"}; 
+        private String[] timeSeriesDataFiles = { "dream4_timeseries" 
+                    , "noexpnoise_dream4_timeseries"
+                    , "noexpnoise_proteins_dream4_timeseries"
+                    , "nonoise_dream4_timeseries"
+                    , "nonoise_proteins_dream4_timeseries"
+                    , "proteins_dream4_timeseries"}; 
         
 	/** URL to the last settings file opened */
 	private URL lastSettingsURL_ = null;
